@@ -1,0 +1,1 @@
+Error: dreckssau.exceptions.DreckssauGameFlowException - You need 3 or more player to run the Game. - 11/05/2018 13:34:06
