@@ -1,6 +1,5 @@
 package dreckssau.game;
 
-public enum GamePhase {
-	BidTricks,
-	Tricks;
+public interface GamePhase {
+	public boolean placeNext(int i);
 }

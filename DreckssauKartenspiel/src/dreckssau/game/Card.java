@@ -12,12 +12,14 @@ public class Card {
 
 	public String getCardString() {
 		String out = "";
-		out += this.rank + " of " + this.suit;
+		out+= "|" +String.format("%-3s", rank.getRank()) +"|\n";
+		out+= "| " +suit.getSuit() +" |\n";
+		out+= "|" +String.format("%3s", rank.getRank()) +"|";
 		return out;
 	}
 	
 	@Override
 	public String toString() {
-		return getCardString();
+		return this.rank + " of " + this.suit;
 	}
 }

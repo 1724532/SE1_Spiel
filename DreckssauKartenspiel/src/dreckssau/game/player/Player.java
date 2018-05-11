@@ -60,5 +60,8 @@ public abstract class Player {
 	public ArrayList<Card> getHand() {
 		return this.hand;
 	}
+	public void addCardToHand(Card c) {
+		this.hand.add(c);
+	}
 
 }
