@@ -18,7 +18,7 @@ public class Main {
 		System.out.println(game.getGameIsRunning());
 		game.StartGame();
 		System.out.println(game.getCurrentPlayer());
-		System.out.println(game.getAllPlayers());
+		System.out.println(game.getAllPlayers()); 
 //		System.out.println(game.getHand());
 		System.out.println(game.getHand());
 		
