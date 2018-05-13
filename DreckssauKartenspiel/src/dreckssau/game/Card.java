@@ -22,4 +22,13 @@ public class Card {
 	public String toString() {
 		return this.rank + " of " + this.suit;
 	}
+
+	public CardSuit getSuit() {
+		return suit;
+	}
+
+	public CardRank getRank() {
+		return rank;
+	}
+	
 }

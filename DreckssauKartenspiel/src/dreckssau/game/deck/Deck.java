@@ -17,8 +17,7 @@ public class Deck {
 	public void resetAndShuffle() {
 		ArrayList<Card> toShuffle = newSet();
 		for (Card k : toShuffle) {
-			System.out.println(k);
-			System.out.println(k.getCardString());
+
 		}
 
 		set = new ArrayList<>();
@@ -40,6 +39,7 @@ public class Deck {
 		}
 		return newSet;
 	}
+
 	public Card drawNext() {
 		Card nextCard = set.get(0);
 		set.remove(0);

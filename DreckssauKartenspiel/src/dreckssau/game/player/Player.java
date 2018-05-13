@@ -60,8 +60,13 @@ public abstract class Player {
 	public ArrayList<Card> getHand() {
 		return this.hand;
 	}
+	
 	public void addCardToHand(Card c) {
 		this.hand.add(c);
 	}
-
+	
+	public void resetTricks() {
+		this.bidTricks = 0;
+		this.tricks = 0;
+	}
 }

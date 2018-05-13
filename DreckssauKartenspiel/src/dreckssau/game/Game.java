@@ -1,9 +1,9 @@
 package dreckssau.game;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
-import dreckssau.exceptions.DreckssauException;
 import dreckssau.exceptions.DreckssauGameFlowException;
 import dreckssau.exceptions.DreckssauPlayerException;
 import dreckssau.game.deck.Deck;
@@ -23,6 +23,7 @@ public class Game {
 	 * initilizes basic game attributes.
 	 */
 	public Game() {
+		set = new Deck();
 		this.players = new ArrayList<>();
 		this.gameIsRunning = false;
 		this.roundNumber = 0;
@@ -104,11 +105,21 @@ public class Game {
 			if (players.size() < 3) {
 				throw new DreckssauGameFlowException("You need 3 or more player to run the Game.");
 			}
+			boolean humanExists = false;
+			for (Player p : players) {
+				if (p instanceof Human) {
+					humanExists = true;
+				}
+			}
+			if (!humanExists) {
+				throw new DreckssauGameFlowException("You need at least 1 Human Player to start the game.");
+			}
 			gameIsRunning = true;
 			Random rand = new Random();
 			this.currentPlayer = players.get(rand.nextInt(players.size()));
 			this.nextRound();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -117,7 +128,7 @@ public class Game {
 	 * 
 	 * @return amount of tricks to play;
 	 */
-	private int getTrickstoPlay() {
+	public int getTrickstoPlay() {
 		int tricksToPlay = 0;
 		if (this.roundNumber < 6) {
 			tricksToPlay = this.roundNumber;
@@ -194,8 +205,11 @@ public class Game {
 	 * sets the next round, shuffle the deck and give every player new cards.
 	 */
 	private void nextRound() {
-		this.round = new Round(this.currentPlayer, this.roundNumber, this.getTrickstoPlay());
 		this.roundNumber++;
+		for (Player p : players) {
+			p.resetTricks();
+		}
+		this.round = new Round();
 		set.resetAndShuffle();
 		for (int i = 0; i < this.getTrickstoPlay(); i++) {
 			for (Player p : players) {
@@ -240,6 +254,10 @@ public class Game {
 		}
 	}
 
+	public int getRound() {
+		return this.roundNumber;
+	}
+
 	/**
 	 * doing the next bid i or play the next card i if currentPlayer is an human
 	 * player.
@@ -258,12 +276,10 @@ public class Game {
 			boolean isOver = false;
 			isOver = round.placeNext(i);
 			if (isOver) {
-				this.nextRound();
+				this.endRound();
 			}
-
 		} catch (Exception e) {
 		}
-
 	}
 
 	/**
@@ -281,46 +297,49 @@ public class Game {
 			boolean isOver = false;
 			isOver = round.placeNext(0);
 			if (isOver) {
-				this.nextRound();
+				this.endRound();
 			}
-
 		} catch (Exception e) {
 		}
 
 	}
 
-//	public void bid(int i) {
-//		try {
-//			if (!gameIsRunning) {
-//				throw new DreckssauGameFlowException("Game isn't running.");
-//			}
-//			if (this.phase == GamePhase.Tricks) {
-//				throw new DreckssauGameFlowException("You may only bid in the bid Phase.");
-//			}
-//			if (i > this.currentPlayer.getHand().size() || i < 0) {
-//				throw new DreckssauGameFlowException(
-//						"You may only bid between 0 and the max amount of tricks this round");
-//			}
-//			if (isNextPlayer() == this.playerStartedTricks) {
-//				int count = 0;
-//				for (Player p : players) {
-//					count += p.getBidTricks();
-//				}
-//				if ((count + i) == currentPlayer.getHand().size()) {
-//					throw new DreckssauGameFlowException(
-//							"The Last player bidding have to create a difference between all bids and max tricksS");
-//				}
-//			}
-//
-//			this.currentPlayer.setBidTricks(i);
-//			this.setNextPlayer();
-//			if (this.currentPlayer == this.playerStartedTricks) {
-//				this.phase = GamePhase.Tricks;
-//			}
-//		} catch (Exception e) {
-//
-//		}
-//	}
+	private void endRound() {
+		if (this.roundNumber == 7) {
+			for (Player p : players) {
+				p.addPoints(p.getTricks());
+			}
+
+		} else if (this.roundNumber == 8) {
+			for (Player p : players) {
+				p.addPoints(-p.getTricks());
+			}
+		} else {
+			for (Player p : players) {
+				if (p.getBidTricks() == p.getTricks()) {
+					p.addPoints(5 + p.getTricks());
+				} else {
+					p.addPoints(-Math.abs(p.getBidTricks() - p.getTricks()));
+				}
+			}
+		}
+		if (this.roundNumber == 14) {
+			endGame();
+		} else {
+			this.nextRound();
+		}
+	}
+
+	private void endGame() {
+
+	}
+
+	public void printPoints() {
+		for (Player p : players) {
+			
+		}
+	}
+
 	/**
 	 * returns the next player.
 	 * 
@@ -340,7 +359,7 @@ public class Game {
 		}
 		return players.get(playerCounter);
 	}
-	
+
 	/**
 	 * sets the currentPlayer to the next player.
 	 */
@@ -348,26 +367,189 @@ public class Game {
 		this.currentPlayer = getNextPlayer();
 	}
 
-//	public void placeCard(int i) {
-//		try {
-//			if (!gameIsRunning) {
-//				throw new DreckssauGameFlowException("Game isn't running.");
-//			}
-//			if (this.phase == GamePhase.BidTricks) {
-//				throw new DreckssauGameFlowException("You may only place card in the tricks Phase.");
-//			}
-//			if (i > this.currentPlayer.getHand().size() || i < 0) {
-//				throw new DreckssauGameFlowException(
-//						"You may only pick a card between 0 and the amount of card on your Hand.");
-//			}
-//
-//			this.currentPlayer.setBidTricks(i);
-//			this.setNextPlayer();
-//			if (this.currentPlayer == this.playerStartedTricks) {
-//				this.phase = GamePhase.Tricks;
-//			}
-//		} catch (Exception e) {
-//
-//		}
-//	}
+	public String getBidStatus() {
+		try {
+			if (!gameIsRunning) {
+				throw new DreckssauGameFlowException("Game is not running.");
+			}
+			String out = "";
+			for (Player p : players) {
+				out += p.getName() + " bid: " + p.getBidTricks() + " has now: " + p.getTricks() + "\n";
+			}
+			return out;
+		} catch (Exception e) {
+
+		}
+		return null;
+
+	}
+
+	public String getCardSetStatus() {
+		String out = "";
+		try {
+			if (!gameIsRunning) {
+				throw new DreckssauGameFlowException("Game is not running.");
+			}
+			if (!this.getGamePhase().equals("TricksPhase")) {
+				throw new DreckssauGameFlowException("You may only use this method while in Tricks Phase.");
+			}
+			out += this.round.getTrickCards();
+		} catch (Exception e) {
+
+		}
+		return out;
+
+	}
+
+	// inner classes
+	// phase interface
+	public interface GamePhase {
+		public boolean placeNext(int i);
+	}
+	// round class
+
+	public class Round {
+		private Player playerStartedRound;
+		private GamePhase phase;
+		private int tricksPlayed;
+
+		public Round() {
+			this.playerStartedRound = currentPlayer;
+			this.tricksPlayed = 0;
+			if (roundNumber == 7 || roundNumber == 8) {
+				this.phase = new TricksPhase();
+			} else {
+				this.phase = new BidPhase();
+			}
+		}
+
+		public String getTrickCards() {
+			if (phase instanceof TricksPhase) {
+				return ((TricksPhase) phase).getTrickCards();
+			}
+			return null;
+		}
+
+		public boolean placeNext(int i) {
+			Boolean isOver = false;
+			isOver = phase.placeNext(i);
+			if (isOver) {
+				if (phase instanceof BidPhase) {
+					phase = new TricksPhase();
+					isOver = false;
+				} else if (phase instanceof TricksPhase) {
+					this.tricksPlayed++;
+					if (tricksPlayed != getTrickstoPlay()) {
+						phase = new TricksPhase();
+						isOver = false;
+					}
+				}
+			}
+			return isOver;
+		}
+
+		public String getGamePhase() {
+			if (phase instanceof BidPhase) {
+				return "BidPhase";
+			} else {
+				return "TricksPhase";
+			}
+		}
+	}
+
+	// bid phase class
+
+	public class BidPhase implements GamePhase {
+		private Player playerStartedTricks;
+
+		public BidPhase() {
+			this.playerStartedTricks = currentPlayer;
+		}
+
+		@Override
+		public boolean placeNext(int i) {
+			try {
+				if (i > currentPlayer.getHand().size() || i < 0) {
+					throw new DreckssauGameFlowException(
+							"You may only bid between 0 and the max amount of tricks this round");
+				}
+				if (getNextPlayer() == this.playerStartedTricks) {
+					int count = 0;
+					for (Player p : players) {
+						count += p.getBidTricks();
+					}
+					if ((count + i) == currentPlayer.getHand().size()) {
+						throw new DreckssauGameFlowException(
+								"The Last player bidding have to create a difference between all bids and max tricks");
+					}
+				}
+				currentPlayer.setBidTricks(i);
+				setNextPlayer();
+				if (currentPlayer == this.playerStartedTricks) {
+					return true;
+				}
+			} catch (Exception e) {
+
+			}
+			return false;
+		}
+
+	}
+
+	// tricks phase class
+	public class TricksPhase implements GamePhase {
+		private Player playerStartedTricks;
+		HashMap<Player, Card> trick;
+
+		public TricksPhase() {
+			this.playerStartedTricks = currentPlayer;
+			trick = new HashMap<>();
+		}
+
+		public String getTrickCards() {
+			String out = "";
+			for (Player p : trick.keySet()) {
+				out += p.getName() + ": " + trick.get(p).getCardString() + " ";
+
+			}
+			return out;
+		}
+
+		@Override
+		public boolean placeNext(int i) {
+			try {
+				if (i > currentPlayer.getHand().size() || i < 0) {
+					throw new DreckssauGameFlowException(
+							"You may only pick a card between 0 and " + (int) (currentPlayer.getHand().size() - 1));
+				}
+				trick.put(currentPlayer, currentPlayer.getHand().get(i));
+				currentPlayer.getHand().remove(i);
+				setNextPlayer();
+				if (currentPlayer == this.playerStartedTricks) {
+					Player bestp = null;
+					Card bestc = null;
+					for (Player p : trick.keySet()) {
+						if (bestp == null) {
+							bestp = p;
+							bestc = trick.get(p);
+						} else {
+							if (trick.get(p).getRank().ordinal() > bestc.getRank().ordinal()) {
+								bestp = p;
+								bestc = trick.get(p);
+							} else if (trick.get(p).getRank().ordinal() == bestc.getRank().ordinal()) {
+								if (trick.get(p).getSuit().ordinal() > bestc.getSuit().ordinal()) {
+									bestp = p;
+									bestc = trick.get(p);
+								}
+							}
+						}
+					}
+					bestp.addTricks();
+					return true;
+				}
+			} catch (Exception e) {
+			}
+			return false;
+		}
+	}
 }
