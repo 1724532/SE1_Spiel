@@ -11,12 +11,18 @@ public class Main {
 		game.addAIPlayer(0);
 		game.startGame();
 		System.out.println(game.getHand());
+		System.out.println(game.getPossibleActions());
 		game.doNextStep();
 		game.doNextStep(0);
+		System.out.println(game.getPossibleActions());
 		game.doNextStep();
 		game.doNextStep(0);
+		System.out.println(game.getPossibleActions());
 		game.doNextStep();
 		game.doNextStep(0);
+		System.out.println(game.getPossibleActions());
+		System.out.println(game.getCardSetStatus());
+		
 //		game.doNextStep();
 //		game.doNextStep(0);
 		System.out.println(game.getHand());

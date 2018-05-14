@@ -12,9 +12,12 @@ public class Card {
 
 	public String getCardString() {
 		String out = "";
-		out+= "|" +String.format("%-3s", rank.getRank()) +"|\n";
-		out+= "| " +suit.getSuit() +" |\n";
-		out+= "|" +String.format("%3s", rank.getRank()) +"|";
+		out+= "╔═════╗\n";
+		out+= "║" +String.format("%-5s", rank.getRank())+"║\n";
+		out+= "║  " +suit.getSuit() +"  ║\n";
+		out+= "║" +String.format("%5s", rank.getRank())+"║\n";
+		out+="╚═════╝";
+		
 		return out;
 	}
 	

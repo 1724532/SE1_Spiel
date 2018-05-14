@@ -295,7 +295,13 @@ public class Game implements IDreckssauHandler {
 				throw new DreckssauGameFlowException("Only an AI player can use this method.");
 			}
 			boolean isOver = false;
-			isOver = round.placeNext(0);
+			ArrayList<Integer> list = round.phase.getPossibleActions();
+			Random rd = new Random();
+			if(list.size()!=1) {
+				isOver = round.placeNext(list.get(rd.nextInt(list.size()-1)));
+			}else {
+				isOver = round.placeNext(list.get(0));
+			}
 			if (isOver) {
 				this.endRound();
 			}
@@ -412,24 +418,30 @@ public class Game implements IDreckssauHandler {
 		sbArr.add(new StringBuilder());
 		sbArr.add(new StringBuilder());
 		sbArr.add(new StringBuilder());
+		sbArr.add(new StringBuilder());
+		sbArr.add(new StringBuilder());
 		for (String s: list) {
 			String[] token = s.split("\n");
-			if(token.length == 3) {
+			if(token.length == 5) {
 				for (int i = 0; i < token.length; i++) {
 					sbArr.get(i).append(token[i] + " ");
 				}
 			}
 			if(token.length == 1) {
-				sbArr.get(2).append(token[0]+" ");
+				sbArr.get(3).append(token[0]+" ");
 				String fill = "";
 				fill = fill.format("%"+token[0].length()+"s", fill);
 				sbArr.get(0).append(fill+" ");
 				sbArr.get(1).append(fill+" ");
+				sbArr.get(2).append(fill+" ");
+				sbArr.get(4).append(fill+" ");
 			}
 		}
 		sb.append(sbArr.get(0).toString() + "\n");
 		sb.append(sbArr.get(1).toString() + "\n");
-		sb.append(sbArr.get(2).toString());
+		sb.append(sbArr.get(2).toString() + "\n");
+		sb.append(sbArr.get(3).toString() + "\n");
+		sb.append(sbArr.get(4).toString());
 
 		return sb.toString();
 	}
@@ -438,6 +450,7 @@ public class Game implements IDreckssauHandler {
 	// phase interface
 	public interface GamePhase {
 		public boolean placeNext(int i);
+		public ArrayList<Integer> getPossibleActions();
 	}
 	// round class
 
@@ -462,7 +475,14 @@ public class Game implements IDreckssauHandler {
 			}
 			return null;
 		}
-
+		public String getPossibleActions() {
+			ArrayList<Integer> list = round.phase.getPossibleActions();
+			String out = "possible actions: ";
+			for(int i:list) {
+				out+= i +" ";
+			}
+			return out;
+		}
 		public boolean placeNext(int i) {
 			Boolean isOver = false;
 			isOver = phase.placeNext(i);
@@ -527,6 +547,27 @@ public class Game implements IDreckssauHandler {
 			return false;
 		}
 
+		@Override
+		public ArrayList<Integer> getPossibleActions() {
+			ArrayList<Integer> list = new ArrayList<>();
+			for(int i = 0; i <= getTricksToPlay();i++) {
+				list.add(i);
+			}
+			if (getNextPlayer() == this.playerStartedTricks) {
+				int count = 0;
+				for (Player p : players) {
+					count += p.getBidTricks();
+				}
+			for(int i:list) {
+				if(getTricksToPlay()==count+i) {
+					list.remove(i);
+					break;
+				}
+			}
+			}
+			return list;
+		}
+
 	}
 
 	// tricks phase class
@@ -584,5 +625,24 @@ public class Game implements IDreckssauHandler {
 			}
 			return false;
 		}
+
+		@Override
+		public ArrayList<Integer> getPossibleActions() {
+			ArrayList<Integer> list = new ArrayList<>();
+			for(int i =0;i<currentPlayer.getHand().size();i++) {
+				list.add(i);
+			}
+			return list;
+		}
+	}
+
+	@Override
+	public String getPossibleActions() {
+		ArrayList<Integer> list = round.phase.getPossibleActions();
+		String out = "possible actions: ";
+		for(int i:list) {
+			out+= i +" ";
+		}
+		return out;
 	}
 }
