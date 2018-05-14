@@ -26,7 +26,7 @@ public interface IDreckssauHandler {
 
     public String getBidStatus();
 
-    public String getCardStatus();
+    public String getCardSetStatus();
 
     public int getTricksToPlay();
 

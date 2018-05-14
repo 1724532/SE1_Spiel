@@ -1,10 +1,11 @@
 package dreckssau.consoleUI;
 
-import dreckssau.game.IDreckssauHandler;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import dreckssau.game.Game;
+import dreckssau.game.IDreckssauHandler;
 
 /**
  * The class is used for handling the UI experience and player input and
@@ -14,7 +15,7 @@ import java.io.InputStreamReader;
  */
 public class Console {
 
-    private IDreckssauHandler = new Game();
+    private IDreckssauHandler game = new Game();
     private InputStreamReader systemIn = new InputStreamReader(System.in);
     private BufferedReader consoleIn = new BufferedReader(systemIn);
 

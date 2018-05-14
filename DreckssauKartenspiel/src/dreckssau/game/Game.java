@@ -11,7 +11,7 @@ import dreckssau.game.player.AI;
 import dreckssau.game.player.Human;
 import dreckssau.game.player.Player;
 
-public class Game {
+public class Game implements IDreckssauHandler {
 	private Deck set;
 	ArrayList<Player> players;
 	private boolean gameIsRunning;
@@ -97,7 +97,7 @@ public class Game {
 	/**
 	 * starts the game if more than 3 players are registered.
 	 */
-	public void StartGame() {
+	public void startGame() {
 		try {
 			if (gameIsRunning) {
 				throw new DreckssauGameFlowException("Game is already running.");
@@ -128,7 +128,7 @@ public class Game {
 	 * 
 	 * @return amount of tricks to play;
 	 */
-	public int getTrickstoPlay() {
+	public int getTricksToPlay() {
 		int tricksToPlay = 0;
 		if (this.roundNumber < 6) {
 			tricksToPlay = this.roundNumber;
@@ -211,7 +211,7 @@ public class Game {
 		}
 		this.round = new Round();
 		set.resetAndShuffle();
-		for (int i = 0; i < this.getTrickstoPlay(); i++) {
+		for (int i = 0; i < this.getTricksToPlay(); i++) {
 			for (Player p : players) {
 				p.addCardToHand(this.set.drawNext());
 			}
@@ -230,25 +230,25 @@ public class Game {
 			if (!gameIsRunning) {
 				throw new DreckssauGameFlowException("Game is not running.");
 			}
-			StringBuilder sb = new StringBuilder();
-			ArrayList<StringBuilder> sbArr = new ArrayList<>();
-			sbArr.add(new StringBuilder());
-			sbArr.add(new StringBuilder());
-			sbArr.add(new StringBuilder());
 			if ((this.roundNumber == 1 || this.roundNumber == 14) && this.getGamePhase().equals("BidPhase")) {
-				return "todo";
-			} else {
-				for (Card c : this.currentPlayer.getHand()) {
-					String[] token = c.getCardString().split("\n");
-					for (int i = 0; i < token.length; i++) {
-						sbArr.get(i).append(token[i] + " ");
+				ArrayList<String> s= new ArrayList<>();
+				for(Player p: players) {
+					if(p != currentPlayer) {
+						s.add(p.getName());
+						for (Card c : p.getHand()) {
+							s.add(c.getCardString());
+						}
 					}
 				}
-				sb.append(sbArr.get(0).toString() + "\n");
-				sb.append(sbArr.get(1).toString() + "\n");
-				sb.append(sbArr.get(2).toString());
+				return this.convertToCardString(s);
+			} else {
+				ArrayList<String> s = new ArrayList<>();
+				s.add(this.currentPlayer.getName());
+				for (Card c : this.currentPlayer.getHand()) {
+					s.add(c.getCardString());
+				}
+				return this.convertToCardString(s);
 			}
-			return sb.toString();
 		} catch (Exception e) {
 			return null;
 		}
@@ -335,8 +335,9 @@ public class Game {
 	}
 
 	public void printPoints() {
+		String out="";
 		for (Player p : players) {
-			
+			out+= p.getName() + ": " + p.getPoints();
 		}
 	}
 
@@ -400,6 +401,38 @@ public class Game {
 		return out;
 
 	}
+	/**
+	 * converts an arraylist with strings into a 3 row card formated display
+	 * @param list is the array of strings you have to put in
+	 * @return returns the formatet string to output;
+	 */
+	private String convertToCardString(ArrayList<String> list) {
+		StringBuilder sb = new StringBuilder();
+		ArrayList<StringBuilder> sbArr = new ArrayList<>();
+		sbArr.add(new StringBuilder());
+		sbArr.add(new StringBuilder());
+		sbArr.add(new StringBuilder());
+		for (String s: list) {
+			String[] token = s.split("\n");
+			if(token.length == 3) {
+				for (int i = 0; i < token.length; i++) {
+					sbArr.get(i).append(token[i] + " ");
+				}
+			}
+			if(token.length == 1) {
+				sbArr.get(2).append(token[0]+" ");
+				String fill = "";
+				fill = fill.format("%"+token[0].length()+"s", fill);
+				sbArr.get(0).append(fill+" ");
+				sbArr.get(1).append(fill+" ");
+			}
+		}
+		sb.append(sbArr.get(0).toString() + "\n");
+		sb.append(sbArr.get(1).toString() + "\n");
+		sb.append(sbArr.get(2).toString());
+
+		return sb.toString();
+	}
 
 	// inner classes
 	// phase interface
@@ -439,7 +472,7 @@ public class Game {
 					isOver = false;
 				} else if (phase instanceof TricksPhase) {
 					this.tricksPlayed++;
-					if (tricksPlayed != getTrickstoPlay()) {
+					if (tricksPlayed != getTricksToPlay()) {
 						phase = new TricksPhase();
 						isOver = false;
 					}
@@ -507,12 +540,12 @@ public class Game {
 		}
 
 		public String getTrickCards() {
-			String out = "";
+			ArrayList<String> s = new ArrayList<>();
 			for (Player p : trick.keySet()) {
-				out += p.getName() + ": " + trick.get(p).getCardString() + " ";
-
+				s.add(p.getName());
+				s.add(this.trick.get(p).getCardString());
 			}
-			return out;
+			return convertToCardString(s);
 		}
 
 		@Override
