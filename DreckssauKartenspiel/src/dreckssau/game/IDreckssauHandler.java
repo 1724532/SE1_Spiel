@@ -1,14 +1,16 @@
 package dreckssau.game;
 
+import java.util.ArrayList;
+
 public interface IDreckssauHandler {
 
-    public void startGame();
+    public String startGame();
 
     public boolean getGameIsRunning();
 
-    public void addAIPlayer(int difficulty);
+    public String addAIPlayer(int difficulty);
 
-    public void addHumanPlayer(String name);
+    public String addHumanPlayer(String name);
 
     public String getAllPlayers();
 
@@ -20,8 +22,7 @@ public interface IDreckssauHandler {
 
     public int getRound();
 
-    public void doNextStep(int i);
-
+    public String doNextStep(int i);
 
     public String getBidStatus();
 
