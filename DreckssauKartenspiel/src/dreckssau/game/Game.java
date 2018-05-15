@@ -216,6 +216,9 @@ public class Game implements IDreckssauHandler {
 				p.addCardToHand(this.set.drawNext());
 			}
 		}
+		if(this.currentPlayer instanceof AI) {
+			this.doNextStep();
+		}
 	}
 
 	/**

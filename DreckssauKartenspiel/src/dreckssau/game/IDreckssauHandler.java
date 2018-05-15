@@ -22,7 +22,6 @@ public interface IDreckssauHandler {
 
     public void doNextStep(int i);
 
-    public void doNextStep();
 
     public String getBidStatus();
 
