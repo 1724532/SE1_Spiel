@@ -149,8 +149,8 @@ public class Game implements IDreckssauHandler {
 			if (gameEnd) {
 				throw new DreckssauGameFlowException("Game is already Over.");
 			}
-			if (gameIsRunning) {
-				throw new DreckssauGameFlowException("Game is already running.");
+			if (!gameIsRunning) {
+				throw new DreckssauGameFlowException("Game is not running.");
 			}
 			int tricksToPlay = 0;
 			if (this.roundNumber < 6) {
@@ -176,8 +176,8 @@ public class Game implements IDreckssauHandler {
 			if (gameEnd) {
 				throw new DreckssauGameFlowException("Game is already Over.");
 			}
-			if (gameIsRunning) {
-				throw new DreckssauGameFlowException("Game is already running.");
+			if (!gameIsRunning) {
+				throw new DreckssauGameFlowException("Game is not running.");
 			}
 			if (this.currentPlayer == null) {
 				throw new DreckssauPlayerException("There is no Current player.");
