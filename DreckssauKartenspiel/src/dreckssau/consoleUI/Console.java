@@ -3,6 +3,9 @@ package dreckssau.consoleUI;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.SQLOutput;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import dreckssau.game.Game;
@@ -56,20 +59,97 @@ public class Console {
 
         for (int i = 1; i <= 14; i++) {
             String[] gameRound = game.getRound().split(";");
-            System.out.println(gameRound[0] + " " + gameRound[1]);
-            System.out.println(gameRound[0].equals("Round") + " " + gameRound[1].equals("1\n"));
-            if (gameRound[0].equals("Round") && gameRound[1].equals("1")) {
+            if (gameRound[0].equals("Round") && gameRound[1].equals("1") || gameRound[1].equals("14")) {
                 this.playFirstRound();
+                System.out.println("Erste Runde fertig!");
+            } else if (gameRound[0].equals("Round") && gameRound[1].equals("7")) {
+                this.playSeventhRound();
+                System.out.println("Siebte Runde fertig!");
+            } else if (gameRound[0].equals("Round") && gameRound[1].equals("8")) {
+                this.playEighthRound();
+                System.out.println("Achte Runde fertig!");
+            } else {
+                playStandardRound();
             }
         }
 
     }
 
-    private void playFirstRound() {
+    private void playStandardRound() {
 
+
+    }
+
+    private void playEighthRound() {
+    }
+
+    private void playSeventhRound() {
+    }
+
+    private void playFirstRound() {
+        System.out.println("- - - - Stichphase - - - -");
         System.out.println(">> Sie sehen die Gegnerkarten! Wie viele Stiche werden Sie machen?");
 
+        String[] playerHand = this.game.getHand().split(";");
+        String[] gamePlayers = this.game.getAllPlayers().split(";");
 
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 1; i < playerHand.length; i++) {
+            String[] individualPlayer = playerHand[i].split(",");
+            sb.append("Karte von").append(individualPlayer[0]).append(": \n").append(this.tools.getCardString
+                    (individualPlayer[1])).append("\n");
+        }
+
+        System.out.println(sb.toString());
+
+        int playerBid = this.getPlayerBid();
+
+        String bidPhaseComplete = this.game.doNextStep(playerBid);
+
+        System.out.println(bidPhaseComplete);
+
+        System.out.println(">> Es wurde wie folgt getippt: ");
+
+//        for (int i = 1; i < bidPhaseComplete.length - 1; i++) {
+//            System.out.println("here");
+//            String[] individualBid = bidPhaseComplete[i].split(",");
+//            System.out.println(individualBid[0] + "  ->  " + individualBid[1]);
+//        }
+
+        System.out.println("\n- - - - Trumpfphase - - - -");
+
+        String[] trickPhaseComplete = game.doNextStep(0).split(";");
+
+        for(String s : trickPhaseComplete){
+            System.out.println(s);
+        }
+
+
+    }
+
+    private int getPlayerBid() {
+
+        ArrayList<String> possibleActions = new ArrayList<>(Arrays.asList(this.game.getPossibleActions().split(";")));
+
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 1; i < possibleActions.size(); i++) {
+            if (i < possibleActions.size() - 1)
+                sb.append(possibleActions.get(i)).append(",");
+            else sb.append(possibleActions.get(i));
+        }
+
+        System.out.println("Bitte geben Sie ihre Anzahl an Stichen an! (Regelbedingt moeglich: " + sb.toString() + ")");
+
+        String input = scan.nextLine();
+
+        if (input != null && !("").equals(input) && possibleActions.contains(input)) {
+            return Integer.parseInt(input);
+        } else {
+            System.out.println("Sie haben einen nicht moeglichen Stich angegeben! Bitte erneut eingeben!");
+            return this.getPlayerBid();
+        }
     }
 
     private int getBotSkillLevel(int i) {
