@@ -6,7 +6,7 @@ public interface IDreckssauHandler {
 
     public String startGame();
 
-    public boolean getGameIsRunning();
+    public String getGameIsRunning();
 
     public String addAIPlayer(int difficulty);
 
@@ -20,7 +20,7 @@ public interface IDreckssauHandler {
 
     public String getHand();
 
-    public int getRound();
+    public String getRound();
 
     public String doNextStep(int i);
 
@@ -28,7 +28,7 @@ public interface IDreckssauHandler {
 
     public String getCardSetStatus();
 
-    public int getTricksToPlay();
+//    public int getTricksToPlay();
     public String getPossibleActions();
 
 

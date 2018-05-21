@@ -65,7 +65,7 @@ public class Game implements IDreckssauHandler {
 
 			Player newPlayer = new AI(AIcounter, difficulty);
 			this.players.add(newPlayer);
-			return "New AI Player Computer" + AIcounter + " with difficulty: " + difficulty + " was added.";
+			return "AddPlayer;AI;Computer" + AIcounter + ";" + difficulty + "\n";
 		} catch (Exception e) {
 			return null;
 		}
@@ -97,7 +97,7 @@ public class Game implements IDreckssauHandler {
 			}
 			Player newPlayer = new Human(name);
 			this.players.add(newPlayer);
-			return "New Human Player " + name + " was added.";
+			return "AddPlayer;Human;" + name + "\n";
 		} catch (Exception e) {
 			return null;
 		}
@@ -130,8 +130,8 @@ public class Game implements IDreckssauHandler {
 			gameIsRunning = true;
 			Random rand = new Random();
 			this.currentPlayer = players.get(rand.nextInt(players.size()));
-			out += "Game sucessfully started\n";
-			out += "Players: " + this.getAllPlayers() + "\n";
+			out += this.getGameIsRunning();
+			out += this.getAllPlayers();
 			out += this.nextRound();
 			return out;
 		} catch (Exception e) {
@@ -182,7 +182,7 @@ public class Game implements IDreckssauHandler {
 			if (this.currentPlayer == null) {
 				throw new DreckssauPlayerException("There is no Current player.");
 			}
-			return this.currentPlayer.getName();
+			return "CurrentPlayer;" + this.currentPlayer.getName() + "\n";
 		} catch (Exception e) {
 			return null;
 		}
@@ -193,8 +193,9 @@ public class Game implements IDreckssauHandler {
 	 * 
 	 * @return returns whether the game is currently running.
 	 */
-	public boolean getGameIsRunning() {
-		return this.gameIsRunning;
+	public String getGameIsRunning() {
+		return "GameRunning;" + this.gameIsRunning + "\n";
+
 	}
 
 	/**
@@ -207,10 +208,15 @@ public class Game implements IDreckssauHandler {
 			if (players.size() == 0) {
 				throw new DreckssauPlayerException("There are no players.");
 			}
-			String out = "";
-			for (Player p : this.players) {
-				out += p.getName() + " ";
+			String out = "Players;";
+			for (int i = 0; i < this.players.size(); i++) {
+				out += this.players.get(i).getName();
+				if (i != this.players.size() - 1) {
+					out += ";";
+				}
 			}
+			out += "\n";
+
 			return out;
 		} catch (Exception e) {
 			return null;
@@ -230,7 +236,7 @@ public class Game implements IDreckssauHandler {
 			if (!gameIsRunning) {
 				throw new DreckssauGameFlowException("Game is not running.");
 			}
-			return round.getGamePhase();
+			return "GamePhase;" + round.getGamePhase() + "\n";
 		} catch (Exception e) {
 			return null;
 		}
@@ -252,7 +258,7 @@ public class Game implements IDreckssauHandler {
 				p.addCardToHand(this.set.drawNext());
 			}
 		}
-		out += "Round: " + this.roundNumber + " started.\n";
+		out += this.getRound();
 		if (this.currentPlayer instanceof AI) {
 			out += this.doNextStep();
 		}
@@ -274,7 +280,7 @@ public class Game implements IDreckssauHandler {
 			if (!gameIsRunning) {
 				throw new DreckssauGameFlowException("Game is not running.");
 			}
-			if ((this.roundNumber == 1 || this.roundNumber == 14) && this.getGamePhase().equals("BidPhase")) {
+			if ((this.roundNumber == 1 || this.roundNumber == 14) && this.getGamePhase().split(";")[1].equals("BidPhase\n")) {
 				ArrayList<String> s = new ArrayList<>();
 				for (Player p : players) {
 					if (p != currentPlayer) {
@@ -298,8 +304,8 @@ public class Game implements IDreckssauHandler {
 		}
 	}
 
-	public int getRound() {
-		return this.roundNumber;
+	public String getRound() {
+		return "Round;" + this.roundNumber + "\n";
 	}
 
 	/**
@@ -399,9 +405,12 @@ public class Game implements IDreckssauHandler {
 
 	private String getActualScore() {
 		String out = "";
-		out += "[Actual Score] ";
-		for (Player p : players) {
-			out += "[" + p.getName() + ": " + p.getPoints() + "] ";
+		out += "ActualScore;";
+		for (int i = 0; i < this.players.size(); i++) {
+			out += this.players.get(i).getName() + "," + this.players.get(i).getPoints();
+			if (i != this.players.size() - 1) {
+				out += ";";
+			}
 		}
 		return out;
 	}
@@ -410,18 +419,8 @@ public class Game implements IDreckssauHandler {
 		this.gameEnd = true;
 
 		String out = "";
-		out += "Game End.\n";
-		Player best = null;
-		for (Player p : players) {
-			if (best == null) {
-				best = p;
-			} else {
-				if (best.getPoints() < p.getPoints()) {
-					best = p;
-				}
-			}
-		}
-		out += best.getName() + " won the game with " + best.getPoints() + " points.";
+		out += "GameEnd;true";
+		out += this.getActualScore();
 		return out;
 	}
 
@@ -430,10 +429,10 @@ public class Game implements IDreckssauHandler {
 	 * 
 	 * @return returns the next player.
 	 */
-	private Player getNextPlayer() {
+	private Player getNextPlayer(Player p) {
 		int playerCounter = 0;
 		for (int j = 0; j < players.size(); j++) {
-			if (players.get(j) == currentPlayer) {
+			if (players.get(j) == p) {
 				playerCounter = j;
 				break;
 			}
@@ -449,7 +448,7 @@ public class Game implements IDreckssauHandler {
 	 * sets the currentPlayer to the next player.
 	 */
 	private void setNextPlayer() {
-		this.currentPlayer = getNextPlayer();
+		this.currentPlayer = getNextPlayer(this.currentPlayer);
 	}
 
 	public String getBidStatus() {
@@ -460,16 +459,36 @@ public class Game implements IDreckssauHandler {
 			if (!gameIsRunning) {
 				throw new DreckssauGameFlowException("Game is not running.");
 			}
-			String out = "";
-			for (Player p : players) {
-				out += p.getName() + " bid: " + p.getBidTricks() + " has now: " + p.getTricks() + "\n";
+			String out = "BidStatus;";
+
+			if (!this.getGamePhase().split(";")[1].equals("BidPhase\n")) {
+
+				Player dummyPlayer = this.round.phase.playerStartedPhase();
+				for (int i = 0; i < this.players.size(); i++) {
+					out += dummyPlayer.getName() + "," + dummyPlayer.getBidTricks();
+					if (dummyPlayer == this.currentPlayer) {
+						break;
+					} else {
+						out += ";";
+						dummyPlayer = this.getNextPlayer(dummyPlayer);
+					}
+				}
+			} else {
+				for (int i = 0; i < this.players.size(); i++) {
+					out += this.players.get(i).getName() + "," + this.players.get(i).getBidTricks();
+					if (i != this.players.size() - 1) {
+						out += ";";
+					}
+				}
+
 			}
+			out+= "\n";
+
 			return out;
 		} catch (Exception e) {
 
 		}
 		return null;
-
 	}
 
 	public String getCardSetStatus() {
@@ -481,7 +500,7 @@ public class Game implements IDreckssauHandler {
 			if (!gameIsRunning) {
 				throw new DreckssauGameFlowException("Game is not running.");
 			}
-			if (!this.getGamePhase().equals("TricksPhase")) {
+			if (!this.getGamePhase().split(";")[1].equals("TricksPhase\n")) {
 				throw new DreckssauGameFlowException("You may only use this method while in Tricks Phase.");
 			}
 			out += this.round.getTrickCards();
@@ -542,9 +561,12 @@ public class Game implements IDreckssauHandler {
 				throw new DreckssauGameFlowException("Game is not running.");
 			}
 			ArrayList<Integer> list = round.phase.getPossibleActions();
-			String out = "possible actions: ";
-			for (int i : list) {
-				out += i + " ";
+			String out = "possibleActions;";
+			for (int i = 0; i < list.size(); i++) {
+				out += list.get(i);
+				if (i != list.size() - 1) {
+					out += ";";
+				}
 			}
 			return out;
 
@@ -557,6 +579,8 @@ public class Game implements IDreckssauHandler {
 	// phase interface
 	private interface GamePhase {
 		public String placeNext(int i);
+
+		public Player playerStartedPhase();
 
 		public ArrayList<Integer> getPossibleActions();
 	}
@@ -588,8 +612,8 @@ public class Game implements IDreckssauHandler {
 			String out = "";
 			Boolean isOver = false;
 			out += phase.placeNext(i);
-			if (out.split("\n")[out.split("\n").length - 1].equals("Trick over")
-					|| out.split("\n")[out.split("\n").length - 1].equals("Bid over")) {
+			if (out.split("\n")[out.split("\n").length -1].split(";")[0].equals("TrickOver")
+					|| out.split("\n")[out.split("\n").length-1].equals("BidOver")) {
 				isOver = true;
 			}
 			if (isOver) {
@@ -605,7 +629,7 @@ public class Game implements IDreckssauHandler {
 				}
 			}
 			if (isOver) {
-				out += "Round over\n";
+				out += "RoundOver\n";
 				currentPlayer = this.playerStartedRound;
 				setNextPlayer();
 			}
@@ -638,7 +662,7 @@ public class Game implements IDreckssauHandler {
 					throw new DreckssauGameFlowException(
 							"You may only bid between 0 and the max amount of tricks this round");
 				}
-				if (getNextPlayer() == this.playerStartedTricks) {
+				if (getNextPlayer(currentPlayer) == this.playerStartedTricks) {
 					int count = 0;
 					for (Player p : players) {
 						count += p.getBidTricks();
@@ -651,8 +675,8 @@ public class Game implements IDreckssauHandler {
 				currentPlayer.setBidTricks(i);
 				setNextPlayer();
 				if (currentPlayer == this.playerStartedTricks) {
-					out += this.getActualBids() + "\n";
-					out += "Bid over\n";
+					out += getBidStatus();
+					out += "BidOver\n";
 				}
 			} catch (Exception e) {
 
@@ -660,13 +684,13 @@ public class Game implements IDreckssauHandler {
 			return out;
 		}
 
-		public String getActualBids() {
-			String out = "";
-			for (Player p : players) {
-				out += "[" + p.getName() + " bid: " + p.getBidTricks() + "] ";
-			}
-			return out;
-		}
+//		public String getActualBids() {
+//			String out = "";
+//			for (Player p : players) {
+//				out += "[" + p.getName() + " bid: " + p.getBidTricks() + "] ";
+//			}
+//			return out;
+//		}
 
 		@Override
 		public ArrayList<Integer> getPossibleActions() {
@@ -674,7 +698,7 @@ public class Game implements IDreckssauHandler {
 			for (int i = 0; i <= getTricksToPlay(); i++) {
 				list.add(i);
 			}
-			if (getNextPlayer() == this.playerStartedTricks) {
+			if (getNextPlayer(currentPlayer) == this.playerStartedTricks) {
 				int count = 0;
 				for (Player p : players) {
 					count += p.getBidTricks();
@@ -687,6 +711,11 @@ public class Game implements IDreckssauHandler {
 				}
 			}
 			return list;
+		}
+
+		@Override
+		public Player playerStartedPhase() {
+			return this.playerStartedTricks;
 		}
 
 	}
@@ -742,9 +771,8 @@ public class Game implements IDreckssauHandler {
 					}
 					bestp.addTricks();
 					currentPlayer = bestp;
-					out += this.getTrickCards() + "\n";
-					out += "Trick won by: " + bestp.getName() + "\n";
-					out += "Trick over\n";
+					out += this.getTrickCards();
+					out += "TrickOver;"+bestp.getName()+"\n";
 				}
 			} catch (Exception e) {
 			}
@@ -758,6 +786,11 @@ public class Game implements IDreckssauHandler {
 				list.add(i);
 			}
 			return list;
+		}
+
+		@Override
+		public Player playerStartedPhase() {
+			return this.playerStartedTricks;
 		}
 	}
 }
