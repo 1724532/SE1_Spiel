@@ -10,7 +10,7 @@ public enum CardRank {
 	Ten("10"),
 	Ace("A");
 	private String rank;
-	private CardRank(String rank) {
+	CardRank(String rank) {
 		this.rank = rank;
 	}
 	public String getRank() {
