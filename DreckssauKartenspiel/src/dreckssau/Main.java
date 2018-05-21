@@ -24,7 +24,7 @@ public class Main {
 //			System.out.println(game.getGamePhase().split(";")[1]);
 //			System.out.println(game.getGamePhase());
 //			System.out.println(game.getGamePhase().split(";")[1]);
-//			if(game.getGamePhase().split(";")[1].equals("BidPhase\n")) {
+//			if(game.getGamePhase().split(";")[1].equals("BidPhase")) {
 //				System.out.println(game.getBidStatus());
 //			}else {
 //				System.out.println(game.getCardSetStatus());
