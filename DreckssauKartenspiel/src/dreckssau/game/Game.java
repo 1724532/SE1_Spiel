@@ -263,6 +263,9 @@ public class Game implements IDreckssauHandler {
 			if (!out.equals("") && (sub != null || !sub.equals(""))) {
 				out += "\n" + sub;
 			}
+			else if (sub != null || !sub.equals("")) {
+				out += sub;
+			}
 		}
 		return out;
 	}
@@ -312,6 +315,7 @@ public class Game implements IDreckssauHandler {
 				return sb.toString();
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -341,21 +345,25 @@ public class Game implements IDreckssauHandler {
 			if (out.split("\n")[out.split("\n").length - 1].equals("RoundOver")) {
 				isOver = true;
 			}
-
 			if (isOver) {
 				String sub = this.endRound();
 				if (!out.equals("") && (sub != null || !sub.equals(""))) {
 					out += "\n" + sub;
+				} else if (sub != null || !sub.equals("")) {
+					out += sub;
 				}
 			} else {
 				if (this.currentPlayer instanceof AI) {
 					String sub = this.doNextStep();
 					if (!out.equals("") && (sub != null || !sub.equals(""))) {
 						out += "\n" + sub;
+					} else if (sub != null || !sub.equals("")) {
+						out += sub;
 					}
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 
 		}
 		return out;
@@ -383,16 +391,21 @@ public class Game implements IDreckssauHandler {
 				String sub = this.endRound();
 				if (!out.equals("") && (sub != null || !sub.equals(""))) {
 					out += "\n" + sub;
+				} else if (sub != null || !sub.equals("")) {
+					out += sub;
 				}
 			} else {
 				if (this.currentPlayer instanceof AI) {
 					String sub = this.doNextStep();
 					if (!out.equals("") && (sub != null || !sub.equals(""))) {
 						out += "\n" + sub;
+					} else if (sub != null || !sub.equals("")) {
+						out += sub;
 					}
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return out;
 
@@ -424,10 +437,16 @@ public class Game implements IDreckssauHandler {
 			if (!out.equals("") && (sub != null || !sub.equals(""))) {
 				out += "\n" + sub;
 			}
+			else if (sub != null || !sub.equals("")) {
+				out += sub;
+			}
 		} else {
 			String sub = this.nextRound();
 			if (!out.equals("") && (sub != null || !sub.equals(""))) {
 				out += "\n" + sub;
+			}
+			else if (sub != null || !sub.equals("")) {
+				out += sub;
 			}
 		}
 		return out;
@@ -515,6 +534,7 @@ public class Game implements IDreckssauHandler {
 
 			return out;
 		} catch (Exception e) {
+			e.printStackTrace();
 
 		}
 		return null;
@@ -534,6 +554,7 @@ public class Game implements IDreckssauHandler {
 			}
 			out += this.round.getTrickCards();
 		} catch (Exception e) {
+			e.printStackTrace();
 
 		}
 		return out;
@@ -600,6 +621,7 @@ public class Game implements IDreckssauHandler {
 			return out;
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -711,6 +733,7 @@ public class Game implements IDreckssauHandler {
 					out += "BidOver";
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 
 			}
 			return out;
@@ -755,12 +778,15 @@ public class Game implements IDreckssauHandler {
 		}
 
 		public String getTrickCards() {
+			StringBuilder sb = new StringBuilder();
 			ArrayList<String> s = new ArrayList<>();
 			for (Player p : trick.keySet()) {
 				s.add(p.getName());
+				sb.append(p.getName()).append(",");
 				s.add(this.trick.get(p).getCardString());
+				sb.append(this.trick.get(p).toString()).append(";");
 			}
-			return convertToCardString(s);
+			return sb.toString();
 		}
 
 		@Override
@@ -799,6 +825,7 @@ public class Game implements IDreckssauHandler {
 					out += "TrickOver;" + bestp.getName();
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			return out;
 		}

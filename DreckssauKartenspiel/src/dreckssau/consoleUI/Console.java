@@ -97,7 +97,7 @@ public class Console {
 
         for (int i = 1; i < playerHand.length; i++) {
             String[] individualPlayer = playerHand[i].split(",");
-            sb.append("Karte von").append(individualPlayer[0]).append(": \n").append(this.tools.getCardString
+            sb.append(">>Karte von").append(individualPlayer[0]).append(": \n").append(this.tools.getCardString
                     (individualPlayer[1])).append("\n");
         }
 
@@ -105,27 +105,38 @@ public class Console {
 
         int playerBid = this.getPlayerBid();
 
-        String bidPhaseComplete = this.game.doNextStep(playerBid);
+        String[] bidPhaseCompleteFull = this.game.doNextStep(playerBid).split("\n");
+        String[] bidPhaseComplete = bidPhaseCompleteFull[0].split(";");
 
-        System.out.println(bidPhaseComplete);
+        System.out.println(">>>> Es wurde wie folgt getippt: ");
 
-        System.out.println(">> Es wurde wie folgt getippt: ");
-
-//        for (int i = 1; i < bidPhaseComplete.length - 1; i++) {
-//            System.out.println("here");
-//            String[] individualBid = bidPhaseComplete[i].split(",");
-//            System.out.println(individualBid[0] + "  ->  " + individualBid[1]);
-//        }
-
-        System.out.println("\n- - - - Trumpfphase - - - -");
-
-        String[] trickPhaseComplete = game.doNextStep(0).split(";");
-
-        for(String s : trickPhaseComplete){
-            System.out.println(s);
+        for (int i = 1; i < bidPhaseComplete.length; i++) {
+            String[] individualBid = bidPhaseComplete[i].split(",");
+            System.out.println(individualBid[0] + "  ->  " + individualBid[1]);
         }
 
 
+        System.out.println("\n- - - - Trumpfphase - - - -");
+        String[] trickPhaseCompleteFull = game.doNextStep(0).split("\n");
+        String[] trickPhaseCards = trickPhaseCompleteFull[0].split(";");
+
+        for (String s : trickPhaseCompleteFull) {
+            System.out.println(s);
+        }
+
+        for (int i = 0; i < trickPhaseCards.length; i++) {
+            String[] individualTrick = trickPhaseCards[i].split(",");
+            System.out.println(">> Karte von " + individualTrick[0] + ": \n" + tools.getCardString(individualTrick[1]));
+        }
+
+        System.out.println(">>>> Gewinner dieser Trumpfphase: " + trickPhaseCompleteFull[1].split(";")[1] + "\n");
+
+        System.out.println(">> Punktestand nach der ersten Runde: ");
+        String[] endOfRoundScore = trickPhaseCompleteFull[3].split(";");
+        for (int i = 1; i < endOfRoundScore.length; i++) {
+            String[] individualScore = endOfRoundScore[i].split(",");
+            System.out.println(individualScore[0] + "  ->  " + individualScore[1]);
+        }
     }
 
     private int getPlayerBid() {
