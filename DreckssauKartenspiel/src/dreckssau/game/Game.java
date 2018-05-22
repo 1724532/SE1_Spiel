@@ -144,7 +144,7 @@ public class Game implements IDreckssauHandler {
 	 *
 	 * @return amount of tricks to play;
 	 */
-	public int getTricksToPlay() {
+	private int getTricksToPlay() {
 		try {
 			if (gameEnd) {
 				throw new DreckssauGameFlowException("Game is already Over.");
@@ -152,7 +152,7 @@ public class Game implements IDreckssauHandler {
 			if (!gameIsRunning) {
 				throw new DreckssauGameFlowException("Game is not running.");
 			}
-			int tricksToPlay = 0;
+			int tricksToPlay;
 			if (this.roundNumber < 6) {
 				tricksToPlay = this.roundNumber;
 			} else if (this.roundNumber > 5 && this.roundNumber < 10) {
@@ -302,7 +302,7 @@ public class Game implements IDreckssauHandler {
 				return sb.toString();
 			} else {
 				ArrayList<String> s = new ArrayList<>();
-				sb.append("Hand;").append(this.currentPlayer.getName()).append(",");
+				sb.append(this.currentPlayer.getName()).append(",");
 
 				for (int i = 0; i < this.currentPlayer.getHand().size(); i++) {
 					if (i < this.currentPlayer.getHand().size() - 1) {
@@ -561,46 +561,6 @@ public class Game implements IDreckssauHandler {
 
 	}
 
-	/**
-	 * converts an arraylist with strings into a 3 row card formated display
-	 *
-	 * @param list
-	 *            is the array of strings you have to put in
-	 * @return returns the formatet string to output;
-	 */
-	private String convertToCardString(ArrayList<String> list) {
-		StringBuilder sb = new StringBuilder();
-		ArrayList<StringBuilder> sbArr = new ArrayList<>();
-		sbArr.add(new StringBuilder());
-		sbArr.add(new StringBuilder());
-		sbArr.add(new StringBuilder());
-		sbArr.add(new StringBuilder());
-		sbArr.add(new StringBuilder());
-		for (String s : list) {
-			String[] token = s.split("\n");
-			if (token.length == 5) {
-				for (int i = 0; i < token.length; i++) {
-					sbArr.get(i).append(token[i] + " ");
-				}
-			}
-			if (token.length == 1) {
-				sbArr.get(3).append(token[0] + " ");
-				String fill = "";
-				fill = fill.format("%" + token[0].length() + "s", fill);
-				sbArr.get(0).append(fill + " ");
-				sbArr.get(1).append(fill + " ");
-				sbArr.get(2).append(fill + " ");
-				sbArr.get(4).append(fill + " ");
-			}
-		}
-		sb.append(sbArr.get(0).toString() + "\n");
-		sb.append(sbArr.get(1).toString() + "\n");
-		sb.append(sbArr.get(2).toString() + "\n");
-		sb.append(sbArr.get(3).toString() + "\n");
-		sb.append(sbArr.get(4).toString());
-
-		return sb.toString();
-	}
 
 	public String getPossibleActions() {
 		try {
@@ -704,7 +664,7 @@ public class Game implements IDreckssauHandler {
 	public class BidPhase implements GamePhase {
 		private Player playerStartedTricks;
 
-		public BidPhase() {
+		BidPhase() {
 			this.playerStartedTricks = currentPlayer;
 		}
 
