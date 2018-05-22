@@ -1,10 +1,10 @@
 package dreckssau.consoleUI;
 
+import dreckssau.game.IDreckssauHandler;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
-
-import dreckssau.game.IDreckssauHandler;
 
 /**
  * The class is used for handling the UI experience and player input and
@@ -26,6 +26,10 @@ public class Console {
         this.getGameConfiguration();
     }
 
+    /**
+     * This method gets the player name, the amount of enemy players and their respective skill level. After setup it
+     * starts the game and calls the logic handler methods.
+     */
     private void getGameConfiguration() {
 
         String playerName = this.getPlayerName();
@@ -33,7 +37,6 @@ public class Console {
         this.game.addHumanPlayer(playerName);
 
         int botAmount = this.getBotAmount();
-
 
         for (int i = 0; i < botAmount; i++) {
             int skillLevel = this.getBotSkillLevel(i);
@@ -45,9 +48,11 @@ public class Console {
         scan.nextLine();
 
         this.startGame();
-
     }
 
+    /**
+     * This method terates over the 14 game rounds and calls the according round logic handlers based on round number.
+     */
     private void startGame() {
 
         this.game.startGame();
@@ -66,20 +71,18 @@ public class Console {
                 playStandardRound();
             }
         }
-
     }
 
+    /**
+     * This method handles the logic for a standard round without extra actions which are handled separately.
+     */
     private void playStandardRound() {
-
         int round = Integer.parseInt(game.getRound().split(";")[1]);
         System.out.println("\n- - - - [Runde " + round + "] - - - ");
         System.out.println("- - - - Stichphase - - - -");
         System.out.println(">> Sie sehen Ihre Karten! Wie viele Stiche werden Sie machen?");
-
         String[] playerHand = this.game.getHand().split(";");
-
         System.out.println(tools.convertToCardString(displayFormattedHand(playerHand)));
-
         while (true) {
             if (game.getGamePhase().split(";")[1].equals("BidPhase")) {
 
@@ -94,68 +97,78 @@ public class Console {
                     String[] individualBid = bidPhaseComplete[i].split(",");
                     System.out.println(individualBid[0] + "  ->  " + individualBid[1]);
                 }
+            }
+            if (handleTricksPhase()) break;
+        }
+    }
 
+    /**
+     * This method handles the tricks phase and asks the user repeatedly for their intended card to play.
+     *
+     * @return boolean whether the tricks phase is finished being handled
+     */
+    private boolean handleTricksPhase() {
+        if (game.getGamePhase().split(";")[1].equals("TricksPhase")) {
+            System.out.println("\n- - - - Trumpfphase - - - -");
+            System.out.println("Welche Karte wollen Sie spielen?");
 
+            int chosenCard = getPlayerCardToPlay();
+
+            ArrayList<String> trickPhaseCompleteFull = new ArrayList<>(Arrays.asList(game.doNextStep
+                    (chosenCard).split("\n")));
+
+            String[] trickPhaseCards = trickPhaseCompleteFull.get(0).split(";");
+
+            ArrayList<String> formattedTricks = new ArrayList<>();
+
+            for (String trickPhaseCard : trickPhaseCards) {
+                String[] individualTrick = trickPhaseCard.split(",");
+                formattedTricks.add(individualTrick[0]);
+                formattedTricks.add(tools.getCardString(individualTrick[1]));
             }
 
-            if (game.getGamePhase().split(";")[1].equals("TricksPhase")) {
-                System.out.println("\n- - - - Trumpfphase - - - -");
-                System.out.println("Welche Karte wollen Sie spielen?");
+            System.out.println(tools.convertToCardString(formattedTricks));
 
-                int chosenCard = getPlayerCardToPlay();
+            System.out.println(">>>> Gewinner des Trumpfes: " + trickPhaseCompleteFull.get(1).split(";")
+                    [1] + "\n");
 
-                ArrayList<String> trickPhaseCompleteFull = new ArrayList<>(Arrays.asList(game.doNextStep
-                        (chosenCard).split("\n")));
 
-                String[] trickPhaseCards = trickPhaseCompleteFull.get(0).split(";");
+            if (trickPhaseCompleteFull.contains("RoundOver")) {
 
-                ArrayList<String> formattedTricks = new ArrayList<>();
+                ArrayList<String> formattedTricksOver = new ArrayList<>();
 
-                for (int i = 0; i < trickPhaseCards.length; i++) {
-                    String[] individualTrick = trickPhaseCards[i].split(",");
-                    formattedTricks.add(individualTrick[0]);
-                    formattedTricks.add(tools.getCardString(individualTrick[1]));
+                for (String trickPhaseCard : trickPhaseCards) {
+                    String[] individualTrick = trickPhaseCard.split(",");
+                    formattedTricksOver.add(individualTrick[0]);
+                    formattedTricksOver.add(tools.getCardString(individualTrick[1]));
                 }
 
-                System.out.println(tools.convertToCardString(formattedTricks));
+                System.out.println(tools.convertToCardString(formattedTricksOver));
 
                 System.out.println(">>>> Gewinner des Trumpfes: " + trickPhaseCompleteFull.get(1).split(";")
                         [1] + "\n");
 
 
-                if (trickPhaseCompleteFull.contains("RoundOver")) {
-                    String[] trickPhaseCardsOver = trickPhaseCompleteFull.get(0).split(";");
-
-                    ArrayList<String> formattedTricksOver = new ArrayList<>();
-
-                    for (int i = 0; i < trickPhaseCards.length; i++) {
-                        String[] individualTrick = trickPhaseCards[i].split(",");
-                        formattedTricksOver.add(individualTrick[0]);
-                        formattedTricksOver.add(tools.getCardString(individualTrick[1]));
-                    }
-
-                    System.out.println(tools.convertToCardString(formattedTricksOver));
-
-                    System.out.println(">>>> Gewinner des Trumpfes: " + trickPhaseCompleteFull.get(1).split(";")
-                            [1] + "\n");
-
-
-                    System.out.println(">>> Punktestand nach Runde: ");
-                    String[] endOfRoundScore = trickPhaseCompleteFull.get(3).split(";");
-                    for (int i = 1; i < endOfRoundScore.length; i++) {
-                        String[] individualScore = endOfRoundScore[i].split(",");
-                        System.out.println(individualScore[0] + "  ->  " + individualScore[1]);
-                    }
-
-                    break;
-
+                System.out.println(">>> Punktestand nach Runde: ");
+                String[] endOfRoundScore = trickPhaseCompleteFull.get(3).split(";");
+                for (int i = 1; i < endOfRoundScore.length; i++) {
+                    String[] individualScore = endOfRoundScore[i].split(",");
+                    System.out.println(individualScore[0] + "  ->  " + individualScore[1]);
                 }
-
+                return true;
             }
         }
-
+        return false;
     }
 
+    /**
+     * This method reformats the players / computers hand cards into a single line output format and displays them to
+     * the user after being coupled with a sysout.
+     *
+     * @param playerHand contains the current player's hand or the played cards by all players after tricks being
+     *                   placed.
+     * @return ArrayList of type String which holds all the formatted names and their attached cards
+     */
     private ArrayList<String> displayFormattedHand(String[] playerHand) {
 
         ArrayList<String> formatted = new ArrayList<>();
@@ -169,9 +182,13 @@ public class Console {
         }
 
         return formatted;
-
     }
 
+    /**
+     * This method asks the user which card he wants to play and checks for its validity in the current game and phase.
+     *
+     * @return int with the number of the proven card
+     */
     private int getPlayerCardToPlay() {
 
         ArrayList<String> possibleActions = new ArrayList<>(Arrays.asList(this.game.getPossibleActions().split(";" +
@@ -198,7 +215,10 @@ public class Console {
         }
     }
 
-
+    /**
+     * This method handles the logic for the eigth round of the game Drecksau, in which there is no bid phase as the
+     * user has to trick instantly to get the lowest possible wins.
+     */
     private void playEighthRound() {
 
         System.out.println("\n- - - - [Runde 8] - - - -");
@@ -207,76 +227,22 @@ public class Console {
 
         String[] playerHand = this.game.getHand().split(";");
 
-        ArrayList<String> formatted = new ArrayList<>();
-
-
-
         System.out.println(tools.convertToCardString(displayFormattedHand(playerHand)));
 
 
         while (true) {
 
-            if (game.getGamePhase().split(";")[1].equals("TricksPhase")) {
-                System.out.println("\n- - - - Trumpfphase - - - -");
-                System.out.println("Welche Karte wollen Sie spielen?");
-
-                int chosenCard = getPlayerCardToPlay();
-
-                ArrayList<String> trickPhaseCompleteFull = new ArrayList<>(Arrays.asList(game.doNextStep
-                        (chosenCard).split("\n")));
-
-                String[] trickPhaseCards = trickPhaseCompleteFull.get(0).split(";");
-
-                ArrayList<String> formattedTricks = new ArrayList<>();
-
-                for (int i = 0; i < trickPhaseCards.length; i++) {
-                    String[] individualTrick = trickPhaseCards[i].split(",");
-                    formattedTricks.add(individualTrick[0]);
-                    formattedTricks.add(tools.getCardString(individualTrick[1]));
-                }
-
-                System.out.println(tools.convertToCardString(formattedTricks));
-
-                System.out.println(">>>> Gewinner des Trumpfes: " + trickPhaseCompleteFull.get(1).split(";")
-                        [1] + "\n");
-
-
-                if (trickPhaseCompleteFull.contains("RoundOver")) {
-                    String[] trickPhaseCardsOver = trickPhaseCompleteFull.get(0).split(";");
-
-                    ArrayList<String> formattedTricksOver = new ArrayList<>();
-
-                    for (int i = 0; i < trickPhaseCards.length; i++) {
-                        String[] individualTrick = trickPhaseCards[i].split(",");
-                        formattedTricksOver.add(individualTrick[0]);
-                        formattedTricksOver.add(tools.getCardString(individualTrick[1]));
-                    }
-
-                    System.out.println(tools.convertToCardString(formattedTricksOver));
-
-                    System.out.println(">>>> Gewinner des Trumpfes: " + trickPhaseCompleteFull.get(1).split(";")
-                            [1] + "\n");
-
-
-                    System.out.println(">>> Punktestand nach Runde: ");
-                    String[] endOfRoundScore = trickPhaseCompleteFull.get(3).split(";");
-                    for (int i = 1; i < endOfRoundScore.length; i++) {
-                        String[] individualScore = endOfRoundScore[i].split(",");
-                        System.out.println(individualScore[0] + "  ->  " + individualScore[1]);
-                    }
-
-                    break;
-
-                }
-
-            }
+            if (handleTricksPhase()) break;
 
 
         }
 
-
     }
 
+    /**
+     * This method handles the logic for the seventh round of the game Drecksau, in which there is no bid phase as
+     * the user to trick instantly to get the highest possible wins.
+     */
     private void playSeventhRound() {
 
         System.out.println("\n- - - - [Runde 7] - - - -");
@@ -285,72 +251,20 @@ public class Console {
 
         String[] playerHand = this.game.getHand().split(";");
 
-
         System.out.println(tools.convertToCardString(displayFormattedHand(playerHand)));
 
-
         while (true) {
-
-            if (game.getGamePhase().split(";")[1].equals("TricksPhase")) {
-                System.out.println("\n- - - - Trumpfphase - - - -");
-                System.out.println("Welche Karte wollen Sie spielen?");
-
-                int chosenCard = getPlayerCardToPlay();
-
-                ArrayList<String> trickPhaseCompleteFull = new ArrayList<>(Arrays.asList(game.doNextStep
-                        (chosenCard).split("\n")));
-
-                String[] trickPhaseCards = trickPhaseCompleteFull.get(0).split(";");
-
-                ArrayList<String> formattedTricks = new ArrayList<>();
-
-                for (int i = 0; i < trickPhaseCards.length; i++) {
-                    String[] individualTrick = trickPhaseCards[i].split(",");
-                    formattedTricks.add(individualTrick[0]);
-                    formattedTricks.add(tools.getCardString(individualTrick[1]));
-                }
-
-                System.out.println(tools.convertToCardString(formattedTricks));
-
-                System.out.println(">>>> Gewinner des Trumpfes: " + trickPhaseCompleteFull.get(1).split(";")
-                        [1] + "\n");
-
-
-                if (trickPhaseCompleteFull.contains("RoundOver")) {
-                    String[] trickPhaseCardsOver = trickPhaseCompleteFull.get(0).split(";");
-
-                    ArrayList<String> formattedTricksOver = new ArrayList<>();
-
-                    for (int i = 0; i < trickPhaseCards.length; i++) {
-                        String[] individualTrick = trickPhaseCards[i].split(",");
-                        formattedTricksOver.add(individualTrick[0]);
-                        formattedTricksOver.add(tools.getCardString(individualTrick[1]));
-                    }
-
-                    System.out.println(tools.convertToCardString(formattedTricksOver));
-
-                    System.out.println(">>>> Gewinner des Trumpfes: " + trickPhaseCompleteFull.get(1).split(";")
-                            [1] + "\n");
-
-
-                    System.out.println(">>> Punktestand nach Runde: ");
-                    String[] endOfRoundScore = trickPhaseCompleteFull.get(3).split(";");
-                    for (int i = 1; i < endOfRoundScore.length; i++) {
-                        String[] individualScore = endOfRoundScore[i].split(",");
-                        System.out.println(individualScore[0] + "  ->  " + individualScore[1]);
-                    }
-
-                    break;
-
-                }
-
-            }
-
-
+            if (handleTricksPhase()) break;
         }
 
     }
 
+    /**
+     * This round handles the first and last round of the game Drecksau, in which the user has no access to its own
+     * single card but sees the computer players' cards. He then has to decide how many of those he will beat with
+     * his card and has to place his bid. If it is the last round, the final score is being printed after the bid and
+     * the results have been processed.
+     */
     private void playFirstOrLastRound() {
         System.out.println("- - - - [Runde " + ((game.getRound().split(";")[1].equals("1")) ? "1]" : "14]") + " - - -" +
                 " -");
@@ -358,14 +272,6 @@ public class Console {
         System.out.println(">> Sie sehen die Gegnerkarten! Wie viele Stiche werden Sie machen?");
 
         String[] playerHand = this.game.getHand().split(";");
-
-        ArrayList<String> formatted = new ArrayList<>();
-
-        for (int i = 1; i < playerHand.length; i++) {
-            String[] individualSplit = playerHand[i].split(",");
-            formatted.add(individualSplit[0]);
-            formatted.add(tools.getCardString(individualSplit[1]));
-        }
 
         System.out.println(tools.convertToCardString(displayFormattedHand(playerHand)));
 
@@ -381,15 +287,14 @@ public class Console {
             System.out.println(individualBid[0] + "  ->  " + individualBid[1]);
         }
 
-
         System.out.println("\n- - - - Trumpfphase - - - -");
         String[] trickPhaseCompleteFull = game.doNextStep(0).split("\n");
         String[] trickPhaseCards = trickPhaseCompleteFull[0].split(";");
 
         ArrayList<String> formattedTricks = new ArrayList<>();
 
-        for (int i = 0; i < trickPhaseCards.length; i++) {
-            String[] individualTrick = trickPhaseCards[i].split(",");
+        for (String trickPhaseCard : trickPhaseCards) {
+            String[] individualTrick = trickPhaseCard.split(",");
             formattedTricks.add(individualTrick[0]);
             formattedTricks.add(tools.getCardString(individualTrick[1]));
         }
@@ -420,6 +325,12 @@ public class Console {
 
     }
 
+    /**
+     * This method captures the user's bid and checks if it is in line with the game's possible actions for this
+     * phase of the game.
+     *
+     * @return int with the proven intended number of bids by the user
+     */
     private int getPlayerBid() {
 
         ArrayList<String> possibleActions = new ArrayList<>(Arrays.asList(this.game.getPossibleActions().split(";" +
@@ -446,6 +357,13 @@ public class Console {
         }
     }
 
+    /**
+     * This method asks the user for the specific skill level (1-3) of the current computer enemy being added to the
+     * game.
+     *
+     * @param i int value with the index of the current computer enemy for output and information purposes
+     * @return int value with the intended skill level and proven value by the user for the specific computer enemy
+     */
     private int getBotSkillLevel(int i) {
 
         System.out.println(">> Bitte geben Sie den gewuenschten Schwierigkeitsgrad des " + (i + 1) + ". " +
@@ -468,6 +386,11 @@ public class Console {
         }
     }
 
+    /**
+     * This method asks the user for the amount of bots he wants to play against (2-4).
+     *
+     * @return int value with the amount of bots being added to the game
+     */
     private int getBotAmount() {
 
         System.out.println(">> Bitte geben Sie gewuenschte Anzahl an Gegnern ein! [2-4]");
@@ -488,6 +411,11 @@ public class Console {
         }
     }
 
+    /**
+     * This method asks the user to input his name and checks for invalid characters and emptiness.
+     *
+     * @return String with the player's input name
+     */
     private String getPlayerName() {
 
         System.out.println(">> Bitte geben Sie Ihren Spielernamen ein!");
@@ -502,7 +430,6 @@ public class Console {
         }
 
     }
-
 
     /**
      * The method shows a Welcome Message to the player and informs about the
