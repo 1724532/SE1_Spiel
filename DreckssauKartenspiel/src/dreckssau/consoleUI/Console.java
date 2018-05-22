@@ -78,6 +78,20 @@ public class Console {
     private void playStandardRound() {
 
 
+        System.out.println(">> Runde " + this.game.getRound().split(";")[1]);
+
+        System.out.println("- - - - Stichphase - - - -");
+
+        System.out.println(">> Sie sehen Ihre Karten!");
+
+        System.out.println(game.getHand());
+        String[] playerHand = this.game.getHand().split(";");
+
+        for (int i = 1; i < playerHand.length; i++) {
+
+        }
+
+
     }
 
     private void playEighthRound() {
