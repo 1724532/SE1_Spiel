@@ -36,6 +36,8 @@ public class Game implements IDreckssauHandler {
 	 *
 	 * @param difficulty
 	 *            decides witch difficulty should be set for the AI.
+	 *            
+	 * 
 	 */
 	public String addAIPlayer(int difficulty) {
 		try {
@@ -262,8 +264,7 @@ public class Game implements IDreckssauHandler {
 			String sub = this.doNextStep();
 			if (!out.equals("") && (sub != null || !sub.equals(""))) {
 				out += "\n" + sub;
-			}
-			else if (sub != null || !sub.equals("")) {
+			} else if (sub != null || !sub.equals("")) {
 				out += sub;
 			}
 		}
@@ -373,6 +374,9 @@ public class Game implements IDreckssauHandler {
 	 * doing the next bid or play the next card if currentPlayer is an AI player.
 	 */
 	private String doNextStep() {
+		AI buffer = (AI) this.currentPlayer;
+		
+		buffer.makeDecision(this.getPossibleActions(),this.players, this.getGamePhase(), this.roundNumber);
 		String out = "";
 		try {
 			boolean isOver = false;
@@ -436,16 +440,14 @@ public class Game implements IDreckssauHandler {
 			String sub = this.endGame();
 			if (!out.equals("") && (sub != null || !sub.equals(""))) {
 				out += "\n" + sub;
-			}
-			else if (sub != null || !sub.equals("")) {
+			} else if (sub != null || !sub.equals("")) {
 				out += sub;
 			}
 		} else {
 			String sub = this.nextRound();
 			if (!out.equals("") && (sub != null || !sub.equals(""))) {
 				out += "\n" + sub;
-			}
-			else if (sub != null || !sub.equals("")) {
+			} else if (sub != null || !sub.equals("")) {
 				out += sub;
 			}
 		}
@@ -560,7 +562,6 @@ public class Game implements IDreckssauHandler {
 		return out;
 
 	}
-
 
 	public String getPossibleActions() {
 		try {
