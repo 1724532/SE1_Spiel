@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 class Tools {
 
-    public String convertToCardString(ArrayList<String> list) {
+    String convertToCardString(ArrayList<String> list) {
         StringBuilder sb = new StringBuilder();
         ArrayList<StringBuilder> sbArr = new ArrayList<>();
         sbArr.add(new StringBuilder());
@@ -19,30 +19,30 @@ class Tools {
             String[] token = s.split("\n");
             if (token.length == 5) {
                 for (int i = 0; i < token.length; i++) {
-                    sbArr.get(i).append(token[i] + " ");
+                    sbArr.get(i).append(token[i]).append(" ");
                 }
             }
             if (token.length == 1) {
-                sbArr.get(3).append(token[0] + " ");
+                sbArr.get(3).append(token[0]).append(" ");
                 String fill = "";
-                fill = fill.format("%" + token[0].length() + "s", fill);
-                sbArr.get(0).append(fill + " ");
-                sbArr.get(1).append(fill + " ");
-                sbArr.get(2).append(fill + " ");
-                sbArr.get(4).append(fill + " ");
+                fill = String.format("%" + token[0].length() + "s", fill);
+                sbArr.get(0).append(fill).append(" ");
+                sbArr.get(1).append(fill).append(" ");
+                sbArr.get(2).append(fill).append(" ");
+                sbArr.get(4).append(fill).append(" ");
             }
         }
-        sb.append(sbArr.get(0).toString() + "\n");
-        sb.append(sbArr.get(1).toString() + "\n");
-        sb.append(sbArr.get(2).toString() + "\n");
-        sb.append(sbArr.get(3).toString() + "\n");
+        sb.append(sbArr.get(0).toString()).append("\n");
+        sb.append(sbArr.get(1).toString()).append("\n");
+        sb.append(sbArr.get(2).toString()).append("\n");
+        sb.append(sbArr.get(3).toString()).append("\n");
         sb.append(sbArr.get(4).toString());
 
         return sb.toString();
     }
 
 
-    public String getCardString(String c) {
+    String getCardString(String c) {
 
         String[] splitCard = c.split(" of ");
 

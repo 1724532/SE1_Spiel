@@ -83,7 +83,7 @@ public class Console {
         System.out.println(">> Sie sehen Ihre Karten! Wie viele Stiche werden Sie machen?");
         String[] playerHand = this.game.getHand().split(";");
         System.out.println(tools.convertToCardString(displayFormattedHand(playerHand)));
-        while (true) {
+        do {
             if (game.getGamePhase().split(";")[1].equals("BidPhase")) {
 
                 int playerBid = this.getPlayerBid();
@@ -98,8 +98,7 @@ public class Console {
                     System.out.println(individualBid[0] + "  ->  " + individualBid[1]);
                 }
             }
-            if (handleTricksPhase()) break;
-        }
+        } while (!handleTricksPhase());
     }
 
     /**
