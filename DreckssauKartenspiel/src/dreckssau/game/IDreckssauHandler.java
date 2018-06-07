@@ -1,6 +1,6 @@
 package dreckssau.game;
 
-import java.util.ArrayList;
+
 
 public interface IDreckssauHandler {
 
@@ -14,7 +14,7 @@ public interface IDreckssauHandler {
 
     public String getAllPlayers();
 
-    public String getCurrentPlayer();
+//    public String getCurrentPlayer();
 
     public String getGamePhase();
 
