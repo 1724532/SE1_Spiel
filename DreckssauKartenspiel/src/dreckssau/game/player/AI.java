@@ -14,7 +14,16 @@ public class AI extends Player {
 		super("Computer" + AIcounter);
 		this.difficulty = difficulty;
 	}
-
+	/**
+	 * this method makes an decision based on input parameters.
+	 * 
+	 * @param possibleActions list of all possible actions at the moment
+	 * @param players array of players
+	 * @param phase string of the actual phase
+	 * @param roundNumber integer of the round number
+	 * @param trickCards string with the trick cards ( if there are any at the moment).
+	 * @return decision.
+	 */
 	public int makeDecision(ArrayList<Integer> possibleActions, ArrayList<Player> players, String phase,
 			int roundNumber, String trickCards) {
 		if (this.difficulty == 1) {
