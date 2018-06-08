@@ -22,15 +22,13 @@ public class Console {
         this.scan = new Scanner(System.in);
         this.game = game;
         this.tools = new Tools();
-        this.welcomeMessage();
-        this.getGameConfiguration();
     }
 
     /**
      * This method gets the player name, the amount of enemy players and their respective skill level. After setup it
-     * starts the game and calls the logic handler methods.
+     * starts the game and calls the logic handler methods. Works as starting point for the game.
      */
-    private void getGameConfiguration() {
+    public void getGameConfiguration() {
 
         String playerName = this.getPlayerName();
 
@@ -434,7 +432,7 @@ public class Console {
      * The method shows a Welcome Message to the player and informs about the
      * creators and their origin.
      */
-    private void welcomeMessage() {
+    public void welcomeMessage() {
         System.out.println("/ - - - - - - - - - - - - \\");
         System.out.println("| >> D R E C K S S A U << |");
         System.out.println("\\ - - - - - - - - - - - - /");

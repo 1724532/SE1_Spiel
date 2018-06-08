@@ -13,6 +13,8 @@ import dreckssau.game.Game;
 public class Main {
 
 	public static void main(String[] args) {
-		new Console(new Game());
+		Console c = new Console(new Game());
+		c.welcomeMessage();
+		c.getGameConfiguration();
 	}
 }
