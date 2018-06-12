@@ -14,14 +14,20 @@ public class AI extends Player {
 		super("Computer" + AIcounter);
 		this.difficulty = difficulty;
 	}
+
 	/**
 	 * this method makes an decision based on input parameters.
 	 * 
-	 * @param possibleActions list of all possible actions at the moment
-	 * @param players array of players
-	 * @param phase string of the actual phase
-	 * @param roundNumber integer of the round number
-	 * @param trickCards string with the trick cards ( if there are any at the moment).
+	 * @param possibleActions
+	 *            list of all possible actions at the moment
+	 * @param players
+	 *            array of players
+	 * @param phase
+	 *            string of the actual phase
+	 * @param roundNumber
+	 *            integer of the round number
+	 * @param trickCards
+	 *            string with the trick cards ( if there are any at the moment).
 	 * @return decision.
 	 */
 	public int makeDecision(ArrayList<Integer> possibleActions, ArrayList<Player> players, String phase,
@@ -324,6 +330,207 @@ public class AI extends Player {
 
 		}
 
+		return 0;
+	}
+
+	ArrayList<Card> sortCard(ArrayList<Card> list) {
+		ArrayList<Card> out = new ArrayList<>();
+		out = list;
+		for (int i = 0; i < out.size(); i++) {
+			for (int j = 0; j < out.size() - 1; j++) {
+				if ((out.get(j).getRank().ordinal() > out.get(j + 1).getRank().ordinal())
+						|| (out.get(j).getRank().ordinal() == out.get(j + 1).getRank().ordinal()
+								&& out.get(j).getSuit().ordinal() > out.get(j + 1).getSuit().ordinal())) {
+					Card buffer = out.get(j);
+					out.set(j, out.get(j + 1));
+					out.set(j + 1, buffer);
+				}
+			}
+		}
+		return out;
+	}
+
+	Card convertStringToCard(String c) {
+		String[] s = c.split(" of ");
+		CardRank rank = CardRank.valueOf(s[0]);
+		CardSuit suit = CardSuit.valueOf(s[1]);
+		return new Card(rank, suit);
+	}
+
+	private int sth(String possibleActions, String player, String hand, String round, String phase, String trickCards) {
+		int fPlayerNumber = player.split(";").length - 1;
+		int fRound = Integer.parseInt(round.split(";")[1]);
+		boolean fPhase = false;
+		ArrayList<Integer> fActions = new ArrayList<>();
+		ArrayList<Card> fHand = new ArrayList<>();
+		ArrayList<Card> fTrickCards = new ArrayList<>();
+		
+
+		if (phase.split(";")[1].equals("TricksPhase")) {
+			fPhase = true;
+		}
+
+		String[] s = possibleActions.split(";");
+		for (int i = 1; i < s.length; i++) {
+			fActions.add(Integer.parseInt(s[i]));
+		}
+
+		String[] s2 = hand.split(";");
+		for (int i = 1; i < s2.length; i++) {
+			if (!s2[i].matches("")) {
+				String[] s3 = s2[i].split(",");
+				for (int j = 1; j < s3.length; j++) {
+					fHand.add(this.convertStringToCard(s3[j]));
+				}
+			}
+		}
+
+		if (fPhase) {
+			if (trickCards != null && !trickCards.matches("")) {
+				String[] s4 = trickCards.split(";");
+				for (int i = 1; i < s2.length; i++) {
+					if (!s2[i].matches("")) {
+						fTrickCards.add(this.convertStringToCard(s4[i].split(",")[1]));
+					}
+				}
+			}
+			
+			
+			
+		}
+		
+
+		if (this.difficulty == 1) {
+			return this.difficulty1(fActions);
+		}
+		if (this.difficulty == 2) {
+			return this.difficulty2(fActions, fHand, fTrickCards, fRound, fPhase, fPlayerNumber, fPhase);
+		}
+
+		return 0;
+	}
+
+	private int difficulty1(ArrayList<Integer> fActions) {
+		Random rd = new Random();
+		return rd.nextInt(fActions.size());
+	}
+
+	private int difficulty2(ArrayList<Integer> fActions, ArrayList<Card> fHand, ArrayList<Card> fTrickCards, int fRound,
+			boolean fPhase, int fPlayerNumber, boolean fReached) {
+		Random rd = new Random();
+		if (!fPhase) {
+			int decision = 0;
+			if (fRound == 1 || fRound == 14) {
+				int counter = 0;
+				for (Card c : fHand) {
+					int a = (c.getRank().ordinal() * 4) + (c.getSuit().ordinal() + 1);
+					if (a < 17) {
+						if (counter == fPlayerNumber) {
+							decision++;
+							counter = 0;
+						}
+						counter++;
+					}
+				}
+			} else {
+				for (Card c : fHand) {
+					int a = (c.getRank().ordinal() * 4) + (c.getSuit().ordinal() + 1);
+					if (a > 16) {
+						decision++;
+					}
+				}
+			}
+			return decision;
+		} else {
+			int highest = 0;
+			for (Card c : fTrickCards) {
+				int a = (c.getRank().ordinal() * 4) + (c.getSuit().ordinal() + 1);
+				if (highest < a) {
+					highest = a;
+				}
+			}
+			ArrayList<Card> possibleCards = new ArrayList<>();
+			for (Card c : fHand) {
+				int a = (c.getRank().ordinal() * 4) + (c.getSuit().ordinal() + 1);
+				if (this.getTricks()>= this.getBidTricks()) {
+					if (a < highest) {
+						possibleCards.add(c);
+					}
+				} else {
+					if (a > highest) {
+						possibleCards.add(c);
+					}
+				}
+			}
+			Card chosen = fHand.get(this.difficulty1(fActions));
+			if (possibleCards.size() != 0) {
+				chosen = possibleCards.get(rd.nextInt(possibleCards.size()));
+			}
+			for (int i = 0; i < fHand.size(); i++) {
+				if (chosen.equals(fHand.get(i))) {
+					return i;
+				}
+			}
+		}
+		return 0;
+	}
+	private int difficulty3(ArrayList<Integer> fActions, ArrayList<Card> fHand, ArrayList<Card> fTrickCards, int fRound,
+			boolean fPhase, int fPlayerNumber, boolean fReached) {
+		Random rd = new Random();
+		if (!fPhase) {
+			int decision = 0;
+			if (fRound == 1 || fRound == 14) {
+				int counter = 0;
+				for (Card c : fHand) {
+					int a = (c.getRank().ordinal() * 4) + (c.getSuit().ordinal() + 1);
+					if (a < 17) {
+						if (counter == fPlayerNumber) {
+							decision++;
+							counter = 0;
+						}
+						counter++;
+					}
+				}
+			} else {
+				for (Card c : fHand) {
+					int a = (c.getRank().ordinal() * 4) + (c.getSuit().ordinal() + 1);
+					if (a > 16) {
+						decision++;
+					}
+				}
+			}
+			return decision;
+		} else {
+			int highest = 0;
+			for (Card c : fTrickCards) {
+				int a = (c.getRank().ordinal() * 4) + (c.getSuit().ordinal() + 1);
+				if (highest < a) {
+					highest = a;
+				}
+			}
+			ArrayList<Card> possibleCards = new ArrayList<>();
+			for (Card c : fHand) {
+				int a = (c.getRank().ordinal() * 4) + (c.getSuit().ordinal() + 1);
+				if (fReached) {
+					if (a > highest) {
+						possibleCards.add(c);
+					}
+				} else {
+					if (a < highest) {
+						possibleCards.add(c);
+					}
+				}
+			}
+			Card chosen = fHand.get(this.difficulty1(fActions));
+			if (possibleCards.size() != 0) {
+				chosen = possibleCards.get(rd.nextInt(possibleCards.size()));
+			}
+			for (int i = 0; i < fHand.size(); i++) {
+				if (chosen.equals(fHand.get(i))) {
+					return i;
+				}
+			}
+		}
 		return 0;
 	}
 

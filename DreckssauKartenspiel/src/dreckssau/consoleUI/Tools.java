@@ -1,5 +1,6 @@
 package dreckssau.consoleUI;
 
+import dreckssau.game.Card;
 import dreckssau.game.CardRank;
 import dreckssau.game.CardSuit;
 
@@ -55,5 +56,26 @@ class Tools {
 
         return out;
     }
-
+    
+    Card convertStringToCard(String c) {
+    	String[] s = c.split(" of ");
+    	CardRank rank = CardRank.valueOf(s[0]);
+    	CardSuit suit = CardSuit.valueOf(s[1]);
+    	return new Card(rank, suit);
+    }
+    
+    ArrayList<Card> sortCard(ArrayList<Card> list){
+    	ArrayList<Card> out = new ArrayList<>();
+    	out = list;
+    	for(int i= 0; i<out.size(); i++) {
+    		for(int j= 0; j<out.size()-1; j++) {
+    			if((out.get(j).getRank().ordinal()>out.get(j+1).getRank().ordinal())||(out.get(j).getRank().ordinal()==out.get(j+1).getRank().ordinal()&&out.get(j).getSuit().ordinal()>out.get(j+1).getSuit().ordinal())) {
+    				Card buffer = out.get(j);
+    				out.set(j, out.get(j+1));
+    				out.set(j+1, buffer);
+    			}
+    		}
+    	}
+    	return out;
+    }
 }
