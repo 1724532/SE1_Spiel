@@ -14,10 +14,13 @@ import java.util.Scanner;
  */
 public class Console {
 
+    // fields with Scanner, the interface reference and the card tools
     private Scanner scan;
     private IDreckssauHandler game;
     private Tools tools;
 
+
+    // constructor
     public Console(IDreckssauHandler game) {
         this.scan = new Scanner(System.in);
         this.game = game;
@@ -30,17 +33,26 @@ public class Console {
      */
     public void getGameConfiguration() {
 
+        // get player name first
         String playerName = this.getPlayerName();
 
+
+        // add human player to the game
         this.game.addHumanPlayer(playerName);
 
+
+        // get the desired amount of computer enemies
         int botAmount = this.getBotAmount();
 
+
+        // add all to the game and ask for skill level in the process
         for (int i = 0; i < botAmount; i++) {
             int skillLevel = this.getBotSkillLevel(i);
             this.game.addAIPlayer(skillLevel);
         }
 
+
+        // wait for user input to start game
         System.out.println(">> Spielvorbereitung abgeschlossen! Beginnen Sie das Spiel mit Enter...");
 
         scan.nextLine();
@@ -55,6 +67,8 @@ public class Console {
 
         this.game.startGame();
 
+
+        // hard coded 14 rounds
         for (int i = 1; i <= 14; i++) {
             String[] gameRound = game.getRound().split(";");
             if (gameRound[0].equals("Round") && gameRound[1].equals("1") || gameRound[1].equals("14")) {
@@ -84,6 +98,8 @@ public class Console {
         do {
             if (game.getGamePhase().split(";")[1].equals("BidPhase")) {
 
+
+                // get player's bid for specific bid phase
                 int playerBid = this.getPlayerBid();
 
                 String[] bidPhaseCompleteFull = this.game.doNextStep(playerBid).split("\n");
@@ -346,9 +362,12 @@ public class Console {
 
         String input = scan.nextLine();
 
+        // input check
         if (input != null && !("").equals(input) && possibleActions.contains(input)) {
             return Integer.parseInt(input);
         } else {
+
+            // bad input handling
             System.out.println("Sie haben einen nicht moeglichen Stich angegeben! Bitte erneut eingeben!");
             return this.getPlayerBid();
         }
@@ -369,6 +388,7 @@ public class Console {
 
         String input = scan.nextLine();
 
+        // input check
         if (input != null && !("").equals(input) && input.matches("[1-3]")) {
             int inputInt = Integer.parseInt(input);
             if (inputInt <= 3 && inputInt >= 1) {
@@ -378,6 +398,7 @@ public class Console {
                 return this.getBotAmount();
             }
         } else {
+            // bad input handling
             System.out.println("Eingegebener Schwierigkeitsgrad ist ungueltig! Bitte erneut eingeben!");
             return this.getBotAmount();
         }
@@ -394,6 +415,7 @@ public class Console {
 
         String input = scan.nextLine();
 
+        // input check
         if (input != null && !("").equals(input) && input.matches("[2-4]")) {
             int inputInt = Integer.parseInt(input);
             if (inputInt <= 4 && inputInt >= 2) {
@@ -403,6 +425,7 @@ public class Console {
                 return this.getBotAmount();
             }
         } else {
+            // bad input handling
             System.out.println("Eingegebene Anzahl ist ungueltig! Bitte erneut eingeben!");
             return this.getBotAmount();
         }
@@ -419,9 +442,11 @@ public class Console {
 
         String input = scan.nextLine();
 
+        // input check
         if (input != null && !("").equals(input) && !input.contains(";") && !input.contains(",")) {
             return input;
         } else {
+            // bad input handling
             System.out.println(">> Ungueltiger Spielername eingegeben! Bitte neu eingeben!");
             return this.getPlayerName();
         }
