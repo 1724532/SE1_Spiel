@@ -325,15 +325,19 @@ public class Game implements IDreckssauHandler {
 	 */
 	private String doNextStepAI() {
 		AI buffer = (AI) this.currentPlayer;
-		buffer.makeDecision(this.round.phase.getPossibleActions(), this.players, this.getGamePhase(), this.roundNumber,
-				this.round.getTrickCards());
 		String out = "";
 		try {
 			boolean isOver = false;
 			ArrayList<Integer> list = round.phase.getPossibleActions();
 			if (list.size() != 1) {
-				out += round.placeNext(buffer.makeDecision(this.round.phase.getPossibleActions(), this.players,
-						this.getGamePhase(), this.roundNumber, this.round.getTrickCards()));
+//				out += round.placeNext(buffer.makeDecision(this.round.phase.getPossibleActions(), this.players,
+//						this.getGamePhase(), this.roundNumber, this.round.getTrickCards()));
+				if(round.phase.equals("TricksPhase")) {
+					out += round.placeNext(buffer.makeDecision(this.getPossibleActions(), this.getAllPlayers(), this.getHand(), this.getRound(), this.getGamePhase(), this.getCardSetStatus()));
+				}
+				else {
+					out += round.placeNext(buffer.makeDecision(this.getPossibleActions(), this.getAllPlayers(), this.getHand(), this.getRound(), this.getGamePhase(), null));
+				}
 			} else {
 				out += round.placeNext(list.get(0));
 			}
