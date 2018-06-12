@@ -1,11 +1,6 @@
 package dreckssau;
 
-import java.util.ArrayList;
-
 import dreckssau.consoleUI.Console;
-import dreckssau.game.Card;
-import dreckssau.game.CardRank;
-import dreckssau.game.CardSuit;
 import dreckssau.game.Game;
 
 /**

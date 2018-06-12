@@ -2,9 +2,7 @@ package dreckssau.consoleUI;
 
 import dreckssau.game.IDreckssauHandler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * The class is used for handling the UI experience and player input and
@@ -18,6 +16,7 @@ public class Console {
     private Scanner scan;
     private IDreckssauHandler game;
     private Tools tools;
+    private Map<String, String> scoreBoard;
 
 
     // constructor
@@ -25,6 +24,7 @@ public class Console {
         this.scan = new Scanner(System.in);
         this.game = game;
         this.tools = new Tools();
+        this.scoreBoard = new HashMap<>();
     }
 
     /**
@@ -167,6 +167,7 @@ public class Console {
                 for (int i = 1; i < endOfRoundScore.length; i++) {
                     String[] individualScore = endOfRoundScore[i].split(",");
                     System.out.println(individualScore[0] + "  ->  " + individualScore[1]);
+                    this.scoreBoard.put(individualScore[0], individualScore[1]);
                 }
                 return true;
             }
@@ -216,12 +217,15 @@ public class Console {
         }
 
         System.out.println(">> Bitte geben Sie ihre gewuenschte Karte zum Spielen an: (" + sb.toString()
-                + ")");
+                + ") | '9' fuer Punktetafel");
 
         String input = scan.nextLine();
 
-        if (input != null && !("").equals(input) && possibleActions.contains(input)) {
+        if (input != null && !("").equals(input) && possibleActions.contains(input) && !input.equals("9")) {
             return Integer.parseInt(input);
+        } else if (("9").equals(input)) {
+            this.printScoreBoard();
+            return this.getPlayerCardToPlay();
         } else {
             System.out.println(">>>> Sie haben eine nicht gueltige Karte eingegeben! Bitte erneut eingeben!");
             return this.getPlayerBid();
@@ -321,6 +325,7 @@ public class Console {
         for (int i = 1; i < endOfRoundScore.length; i++) {
             String[] individualScore = endOfRoundScore[i].split(",");
             System.out.println(individualScore[0] + "  ->  " + individualScore[1]);
+            this.scoreBoard.put(individualScore[0], individualScore[1]);
         }
 
         if (this.game.getRound().split(";")[1].equals("14")) {
@@ -330,6 +335,7 @@ public class Console {
             for (int i = 1; i < endOfRoundScoreFinal.length; i++) {
                 String[] individualScore = endOfRoundScoreFinal[i].split(",");
                 System.out.println(individualScore[0] + "  ->  " + individualScore[1]);
+                this.scoreBoard.put(individualScore[0], individualScore[1]);
             }
 
             System.out.println("\n ...Spiel beendet!");
@@ -337,6 +343,8 @@ public class Console {
         }
 
     }
+
+    // Input methods follow here
 
     /**
      * This method captures the user's bid and checks if it is in line with the game's possible actions for this
@@ -358,19 +366,25 @@ public class Console {
         }
 
         System.out.println("Bitte geben Sie ihre Anzahl an Stichen an! (Regelbedingt moeglich: " + sb.toString()
-                + ")");
+                + ") | '9' fuer Punktetafel");
 
         String input = scan.nextLine();
 
         // input check
-        if (input != null && !("").equals(input) && possibleActions.contains(input)) {
+        if (input != null && !("").equals(input) && possibleActions.contains(input) && !input.equals("S")) {
             return Integer.parseInt(input);
+        } else if (("9").equals(input)) {
+            this.printScoreBoard();
+            return this.getPlayerBid();
+
         } else {
 
             // bad input handling
             System.out.println("Sie haben einen nicht moeglichen Stich angegeben! Bitte erneut eingeben!");
             return this.getPlayerBid();
         }
+
+
     }
 
     /**
@@ -465,7 +479,20 @@ public class Console {
         System.out.println("> programmed by Team 1 | SE1\n> Hochschule " + "Mannheim | 2UIB");
         System.out.println("----------------------------");
         System.out.println("Sie spielen gegen 2 - 4 Computergegner mit individueller Stärke!\n");
+    }
 
+    /**
+     * This method prints out the current score to the user
+     */
+    private void printScoreBoard() {
+        if (this.scoreBoard.isEmpty()) {
+            System.out.println("Noch keine Runde gespielt! Kein Punktestand vorhanden!");
+            return;
+        }
+
+        for (String s : this.scoreBoard.keySet()) {
+            System.out.println(s + " -> " + this.scoreBoard.get(s));
+        }
     }
 
 }
