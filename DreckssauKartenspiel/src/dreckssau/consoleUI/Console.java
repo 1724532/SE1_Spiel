@@ -339,8 +339,12 @@ public class Console {
             }
 
             System.out.println("\n ...Spiel beendet!");
+            System.exit(0);
 
         }
+
+        System.out.println("\n> Erste Runde beendet! Weiter mit Enter...");
+        this.scan.nextLine();
 
     }
 
@@ -490,9 +494,12 @@ public class Console {
             return;
         }
 
+
+        System.out.println("\n>>> PUNKTESTAND <<<");
         for (String s : this.scoreBoard.keySet()) {
             System.out.println(s + " -> " + this.scoreBoard.get(s));
         }
+        System.out.println("\n");
     }
 
 }
