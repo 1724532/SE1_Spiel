@@ -15,6 +15,11 @@ public class AI extends Player {
         this.difficulty = difficulty;
     }
 
+    /**
+     * sorts an array of Cards
+     * @param list input array to sort
+     * @return sorted card array
+     */
     private ArrayList<Card> sortCard(ArrayList<Card> list) {
         ArrayList<Card> out;
         out = list;
@@ -31,14 +36,29 @@ public class AI extends Player {
         }
         return out;
     }
-
+    
+    /**
+     * converts an card string into card object
+     * @param c card string that should be converted
+     * @return converted card object
+     */
     private Card convertStringToCard(String c) {
         String[] s = c.split(" of ");
         CardRank rank = CardRank.valueOf(s[0]);
         CardSuit suit = CardSuit.valueOf(s[1]);
         return new Card(rank, suit);
     }
-
+    
+    /**
+     * this class evaluates input parameters and returns a decision based chosen AI difficulty.
+     * @param possibleActions string returned by getPossibleActions.
+     * @param player string returned by getAllPlayer
+     * @param hand string returned by getHand
+     * @param round string returned by getRound
+     * @param phase string returned by getPhase
+     * @param trickCards string returned by getTrickCards / returns null in BidPhase. 
+     * @return returns the decision in int.
+     */
     public int makeDecision(String possibleActions, String player, String hand, String round, String phase, String
             trickCards) {
         int fPlayerNumber = player.split(";").length - 1;
@@ -103,11 +123,26 @@ public class AI extends Player {
         return decision;
     }
 
+    /**
+     * calculates decision based on difficulty 1 algorythm
+     * @param fActions list of possible actions
+     * @return decision in int
+     */
     private int difficulty1(ArrayList<Integer> fActions) {
         Random rd = new Random();
         return fActions.get(rd.nextInt(fActions.size()));
     }
-
+    
+    /**
+     * calculates decision based on difficulty 2 algorythm
+     * @param fActions list of possible actions
+     * @param fHand list of cards on hand.
+     * @param fTrickCards list of cards on the table
+     * @param fRound round in int
+     * @param fPhase gamePhase in string
+     * @param fPlayerNumber amount of players in int.
+     * @return returns decision in int
+     */
     private int difficulty2(ArrayList<Integer> fActions, ArrayList<Card> fHand, ArrayList<Card> fTrickCards, int fRound,
                             boolean fPhase, int fPlayerNumber) {
         Random rd = new Random();
@@ -167,7 +202,17 @@ public class AI extends Player {
         }
         return 0;
     }
-
+    
+    /**
+     * calculates decision based on difficulty 2 algorythm
+     * @param fActions list of possible actions
+     * @param fHand list of cards on hand.
+     * @param fTrickCards list of cards on the table
+     * @param fRound round in int
+     * @param fPhase gamePhase in string
+     * @param fPlayerNumber amount of players in int.
+     * @return returns decision in int
+     */
     private int difficulty3(ArrayList<Card> fHand, ArrayList<Card> fTrickCards, int fRound,
                             boolean fPhase, int fPlayerNumber) {
         if (!fPhase) {
@@ -230,5 +275,4 @@ public class AI extends Player {
             return decision;
         }
     }
-
 }
