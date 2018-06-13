@@ -402,7 +402,7 @@ public class Console {
 
         System.out.println(">> Bitte geben Sie den gewuenschten Schwierigkeitsgrad des " + (i + 1) + ". " +
                 "Computergegners" +
-                " ein!");
+                " ein! [1-3]");
 
         String input = scan.nextLine();
 
@@ -413,12 +413,12 @@ public class Console {
                 return inputInt;
             } else {
                 System.out.println("Eingegebener Schwierigkeitsgrad ist ungueltig! Bitte erneut eingeben!");
-                return this.getBotAmount();
+                return this.getBotSkillLevel(i);
             }
         } else {
             // bad input handling
             System.out.println("Eingegebener Schwierigkeitsgrad ist ungueltig! Bitte erneut eingeben!");
-            return this.getBotAmount();
+            return this.getBotSkillLevel(i);
         }
     }
 
